@@ -1,0 +1,1391 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#E8145F">
+<title>Little Flower Fit</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one narrow column, bottom tab bar, full-screen timer overlay. Candy pink by day, deep plum at night. */
+:root {
+  --bg: #FFF3F8; --surface: #FFFFFF; --surface2: #FFE4EF; --fg: #2B0F20; --muted: #7D4C68; --line: #F5C9DC;
+  --accent: #E8145F; --accent-ink: #FFFFFF; --soft: #FFD3E5;
+  --c-work: #E8145F; --c-hold: #7C4DFF; --c-rest: #0B8F80; --c-warm: #C77700; --c-cool: #4B57D6;
+  --shadow: 0 8px 28px rgba(232, 20, 95, .13);
+  --display: 'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif;
+  --body: 'Figtree', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #160913; --surface: #241020; --surface2: #341832; --fg: #FFEBF4; --muted: #D2A7BF; --line: #4C2547;
+    --accent: #FF5C9D; --accent-ink: #2B0B1B; --soft: #4A1F40;
+    --c-work: #FF5C9D; --c-hold: #B69CFF; --c-rest: #4FD6C4; --c-warm: #FFC04D; --c-cool: #9AA3FF;
+    --shadow: 0 8px 28px rgba(0, 0, 0, .45); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #160913; --surface: #241020; --surface2: #341832; --fg: #FFEBF4; --muted: #D2A7BF; --line: #4C2547;
+  --accent: #FF5C9D; --accent-ink: #2B0B1B; --soft: #4A1F40;
+  --c-work: #FF5C9D; --c-hold: #B69CFF; --c-rest: #4FD6C4; --c-warm: #FFC04D; --c-cool: #9AA3FF;
+  --shadow: 0 8px 28px rgba(0, 0, 0, .45); color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.45;
+  padding-block: 10px 112px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-tap-highlight-color: transparent;
+}
+.wrap { max-width: 560px; margin: 0 auto; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, .display { font-family: var(--display); text-transform: uppercase; letter-spacing: .01em; line-height: .95; text-wrap: balance; font-weight: 800; }
+h1 { font-size: clamp(40px, 12vw, 56px); }
+h2 { font-size: 30px; }
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; padding: 0; text-align: left; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.kicker { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+.row { display: flex; align-items: center; gap: 10px; }
+.between { justify-content: space-between; }
+.wrapf { flex-wrap: wrap; }
+.grow { flex: 1; min-width: 0; }
+.top { display: flex; align-items: center; justify-content: space-between; padding: 6px 0 14px; }
+.brand { font-family: var(--display); font-weight: 900; font-size: 26px; text-transform: uppercase; letter-spacing: .03em; color: var(--accent); }
+.brand span { color: var(--fg); }
+.date { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
+.card.hero { background: var(--accent); color: var(--accent-ink); border-color: transparent; box-shadow: var(--shadow); }
+.card.hero .kicker { color: inherit; opacity: .85; }
+.quote-text { font-size: 19px; font-weight: 600; line-height: 1.3; text-wrap: balance; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 999px; font-weight: 700; background: var(--surface2); color: var(--fg); border: 1px solid var(--line); text-align: center; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; box-shadow: var(--shadow); }
+.btn.block { width: 100%; }
+.btn.small { min-height: 38px; padding: 0 14px; font-size: 14px; }
+.btn.ghost { background: transparent; }
+.hero .btn { background: rgba(255,255,255,.2); color: inherit; border-color: rgba(255,255,255,.4); }
+:root[data-theme="dark"] .hero .btn { background: rgba(43,11,27,.18); border-color: rgba(43,11,27,.35); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .hero .btn { background: rgba(43,11,27,.18); border-color: rgba(43,11,27,.35); } }
+.chip { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 999px; background: var(--surface2); border: 1px solid var(--line); font-size: 13px; font-weight: 600; }
+.chip.on { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+button.chip { cursor: pointer; }
+.tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+.tabs .chip { flex: none; }
+
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 4px; min-height: 124px; position: relative; }
+.tile:active, .rowbtn:active, .btn:active { transform: scale(.98); }
+.tile svg { width: 30px; height: 30px; color: var(--accent); margin-bottom: 6px; }
+.tile b { font-family: var(--display); font-size: 25px; text-transform: uppercase; line-height: 1; font-weight: 800; }
+.tile span { font-size: 13px; color: var(--muted); }
+.tile i { position: absolute; top: 12px; right: 14px; font-style: normal; font-size: 12px; font-weight: 700; color: var(--muted); }
+.rowbtn { width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: flex; align-items: center; gap: 12px; }
+.rowbtn b { display: block; font-weight: 700; }
+.rowbtn .sub { font-size: 13px; color: var(--muted); }
+.rowbtn .meta { font-family: var(--display); font-weight: 800; font-size: 24px; color: var(--accent); white-space: nowrap; }
+.back { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--muted); min-height: 40px; }
+.back svg, .icon svg { width: 20px; height: 20px; }
+
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.steps li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+.steps li:last-child { border-bottom: 0; }
+.steps li span:last-child { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; margin-top: 6px; background: var(--c-work); }
+.dot.warm { background: var(--c-warm); } .dot.rest { background: var(--c-rest); } .dot.cool { background: var(--c-cool); } .dot.hold { background: var(--c-hold); }
+
+.bar { height: 10px; border-radius: 999px; background: var(--surface2); overflow: hidden; border: 1px solid var(--line); }
+.bar > i { display: block; height: 100%; background: var(--accent); border-radius: 999px; width: 0; transition: width .3s; }
+.stat { display: flex; flex-direction: column; gap: 2px; }
+.stat b { font-family: var(--display); font-size: 36px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+input[type="number"] { font: inherit; font-size: 18px; font-weight: 700; width: 100%; min-height: 48px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 0 12px; }
+.form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.day { aspect-ratio: 1; max-width: 100%; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; text-align: center; }
+.day.done { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.day.today { border: 2px solid var(--accent); }
+.day.miss { color: var(--muted); background: var(--surface2); }
+.day.future { color: var(--muted); opacity: .6; }
+
+.week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; align-items: end; height: 110px; }
+.week div { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; gap: 6px; font-size: 11px; color: var(--muted); font-weight: 700; }
+.week i { display: block; width: 100%; background: var(--accent); border-radius: 8px 8px 3px 3px; min-height: 4px; opacity: .9; }
+.week div.empty i { background: var(--line); opacity: 1; }
+
+.switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.switch:last-child { border-bottom: 0; }
+.tog { width: 52px; height: 30px; border-radius: 999px; background: var(--line); position: relative; flex: none; transition: background .2s; }
+.tog::after { content: ''; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+.tog.on { background: var(--accent); }
+.tog.on::after { transform: translateX(22px); }
+
+nav#nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--surface); border-top: 1px solid var(--line);
+  padding: 8px max(10px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left, 0px)); }
+nav#nav .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+nav#nav button { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 52px; justify-content: center; border-radius: 14px; color: var(--muted); font-size: 12px; font-weight: 700; text-align: center; }
+nav#nav button svg { width: 24px; height: 24px; }
+nav#nav button.on { color: var(--accent); background: var(--surface2); }
+
+#toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(92px + env(safe-area-inset-bottom, 0px)); z-index: 90; background: var(--fg); color: var(--bg); padding: 12px 18px; border-radius: 14px; font-weight: 600; max-width: min(92vw, 420px); text-align: center; box-shadow: var(--shadow); }
+
+/* full-screen overlays: workout player and run tracker */
+.overlay { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; gap: 10px; overflow: hidden;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: var(--bg); background: color-mix(in srgb, var(--phase, var(--c-work)) 15%, var(--bg)); transition: background .35s; }
+.overlay > .col { width: 100%; max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; }
+.flash { position: absolute; inset: 0; background: var(--phase, var(--accent)); opacity: 0; pointer-events: none; z-index: 70; }
+.flash.on { animation: flash .7s ease-out; }
+@keyframes flash { 0% { opacity: .8; } 100% { opacity: 0; } }
+.ptop { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.icon { width: 46px; height: 46px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.icon.off { opacity: .45; }
+.phase { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: .08em; font-size: 20px; color: var(--phase, var(--accent)); text-align: center; }
+.ringwrap { position: relative; width: min(74vw, 46vh, 340px); aspect-ratio: 1; margin: 0 auto; flex: none; }
+.ringwrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ringwrap .bg { stroke: var(--line); }
+.ringwrap .fg { stroke: var(--phase, var(--accent)); transition: stroke .3s; }
+.ringwrap .mid { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.time { font-family: var(--display); font-weight: 800; font-size: clamp(76px, 24vw, 124px); line-height: .9; font-variant-numeric: tabular-nums; }
+.pname { font-family: var(--display); font-weight: 800; text-transform: uppercase; font-size: clamp(30px, 9.5vw, 46px); line-height: 1; text-align: center; text-wrap: balance; overflow-wrap: anywhere; }
+.ptip { text-align: center; color: var(--muted); font-size: 15px; min-height: 22px; text-wrap: balance; }
+.pnext { text-align: center; font-weight: 700; font-size: 15px; }
+.pnext span { color: var(--muted); font-weight: 600; }
+.badges { display: flex; gap: 10px; justify-content: center; }
+.badge { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 8px 16px; text-align: center; min-width: 120px; }
+.badge b { display: block; font-family: var(--display); font-weight: 800; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+.badge span { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.ctrls { display: flex; align-items: center; justify-content: center; gap: 22px; }
+.ctrls .icon { width: 58px; height: 58px; }
+.ctrls .icon.big { width: 84px; height: 84px; background: var(--accent); color: var(--accent-ink); border-color: transparent; box-shadow: var(--shadow); }
+.ctrls .icon.big svg { width: 34px; height: 34px; }
+.ctrls .icon svg { width: 26px; height: 26px; }
+.pfoot { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sheet { position: absolute; inset: 0; z-index: 80; background: rgba(20, 5, 14, .7); display: flex; align-items: flex-end; justify-content: center; padding: 16px; }
+.sheet > div { width: 100%; max-width: 520px; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.done-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 18px; text-align: center; }
+.done-wrap .big { font-family: var(--display); font-weight: 900; font-size: clamp(56px, 18vw, 88px); line-height: .9; text-transform: uppercase; color: var(--accent); }
+.note { font-size: 13px; color: var(--muted); }
+.warn { background: var(--surface2); border: 1px dashed var(--line); border-radius: 14px; padding: 12px; font-size: 14px; }
+@media (prefers-reduced-motion: reduce) { .flash.on { animation-duration: 1.4s; } .tile:active, .rowbtn:active, .btn:active { transform: none; } * { scroll-behavior: auto !important; } }
+</style><style>[hidden]{display:none!important} html{padding-top:env(safe-area-inset-top,0px)}</style></head><body>
+<div class="wrap">
+  <header class="top"><div class="brand">Little Flower <span>Fit</span></div><div class="date" id="today"></div></header>
+  <main id="view"></main>
+</div>
+<nav id="nav"><div class="in" id="navin"></div></nav>
+<div id="player" class="overlay" hidden></div>
+<div id="runner" class="overlay" hidden></div>
+<div id="toast" hidden></div>
+<script>/* Little Flower Fit data: categories, workouts, quotes, challenges */
+(function () {
+  'use strict';
+  var MAX_INCLINE = 15;
+
+  /* ---------- step builders ---------- */
+  var S_ = function (t, n, d, x) { return Object.assign({ t: t, n: n, d: d }, x || {}); };
+  var rep = function (n, arr) { var o = []; for (var i = 0; i < n; i++) o = o.concat(arr); return o; };
+  var TYPE = { w: 'warm', k: 'work', r: 'rest', c: 'cool', h: 'hold' };
+
+  function circ(o) {
+    var work = o.work || 40, rest = o.rest === undefined ? 20 : o.rest, rounds = o.rounds || 3, rr = o.rr === undefined ? 30 : o.rr;
+    var ex = o.ex.map(function (e) { return Array.isArray(e) ? { n: e[0], tip: e[1] } : { n: e }; });
+    var s = [];
+    s.push(S_('warm', 'Warm-up', o.warm || 60, { tip: o.warmTip || 'March in place, arm circles, easy hip circles.' }));
+    for (var r = 1; r <= rounds; r++) {
+      ex.forEach(function (e, i) {
+        s.push(S_('work', e.n, work, { tip: e.tip, r: 'Round ' + r + ' of ' + rounds }));
+        if (i < ex.length - 1 && rest > 0) s.push(S_('rest', 'Rest', rest));
+      });
+      if (r < rounds && rr > 0) s.push(S_('rest', 'Round break', rr, { tip: 'Sip water. Shake it out.' }));
+    }
+    s.push(S_('cool', 'Cool-down', o.cool || 60, { tip: o.coolTip || 'Slow breathing, gentle quad and hamstring stretch.' }));
+    return s;
+  }
+
+  function tabata(exs) {
+    var s = [S_('warm', 'Warm-up', 60, { tip: 'Jog in place, arm swings, bodyweight squats.' })];
+    exs.forEach(function (n, b) {
+      for (var r = 1; r <= 8; r++) {
+        s.push(S_('work', n, 20, { r: 'Block ' + (b + 1) + ' of ' + exs.length + ', ' + r + ' of 8' }));
+        if (r < 8) s.push(S_('rest', 'Rest', 10));
+      }
+      if (b < exs.length - 1) s.push(S_('rest', 'Block break', 30, { tip: 'Breathe. Next block is coming.' }));
+    });
+    s.push(S_('cool', 'Cool-down', 60, { tip: 'Walk it out, slow deep breaths.' }));
+    return s;
+  }
+
+  function lift(o) {
+    var s = [S_('warm', 'Warm-up', o.warm || 300, { tip: 'Five minutes of easy cardio, then one light set of your first lift.' })];
+    o.items.forEach(function (it, b) {
+      var n = it[0], sets = it[1], reps = it[2], rest = it[3] || 60, tip = it[4];
+      for (var k = 1; k <= sets; k++) {
+        s.push(S_('work', n, o.setSecs || 45, { tip: 'Set ' + k + ' of ' + sets + ', ' + reps + (tip ? ', ' + tip : ''), r: 'Exercise ' + (b + 1) + ' of ' + o.items.length }));
+        var last = b === o.items.length - 1 && k === sets;
+        if (!last) s.push(S_('rest', 'Rest', rest, { tip: k === sets ? 'Move to your next station and set the weight.' : 'Shake it out and breathe.' }));
+      }
+    });
+    s.push(S_('cool', 'Cool-down stretch', 180, { tip: 'Slow breathing. Stretch chest, back, quads and hamstrings.' }));
+    return s;
+  }
+
+  /* seq: [name, secs, tip, typeCode?] */
+  function seq(list, def) {
+    return list.map(function (e) { return S_(TYPE[e[3] || def || 'k'], e[0], e[1], e[2] ? { tip: e[2] } : {}); });
+  }
+
+  /* outdoor: [code, name, secs, tip] */
+  function ints(list) {
+    return list.map(function (e) { return S_(TYPE[e[0]], e[1], e[2], e[3] ? { tip: e[3] } : {}); });
+  }
+
+  /* treadmill: [code, secs, mph, incline, label] */
+  function tm(list) {
+    return list.map(function (e) {
+      var code = e[0], secs = e[1], mph = e[2], inc = Math.min(MAX_INCLINE, Math.max(0, e[3]));
+      var label = e[4] || (code === 'w' ? 'Warm-up' : code === 'c' ? 'Cool-down' : code === 'r' ? 'Recover' : (mph >= 5 ? 'Run' : 'Climb'));
+      return S_(TYPE[code], label, secs, {
+        mph: mph, inc: inc,
+        say: label + '. Incline ' + inc + ' percent. Speed ' + mph.toFixed(1) + '.'
+      });
+    });
+  }
+
+  var W = [];
+  function add(cat, name, o) {
+    W.push(Object.assign({ cat: cat, name: name, lvl: 'All levels', eq: 'None', desc: '', grp: null }, o));
+  }
+
+  /* ---------- AT HOME ---------- */
+  add('home', 'Full-Body Starter', { lvl: 'Beginner', eq: 'None', desc: 'Gentle, full-body and joint friendly. A great first workout.',
+    steps: circ({ work: 30, rest: 30, rounds: 2, rr: 45, ex: [['Jumping jacks', 'Step one foot out at a time if you prefer low impact.'], ['Bodyweight squats', 'Sit back, chest tall, knees track over toes.'], ['Incline push-ups', 'Hands on a counter or wall. Body in one line.'], ['Glute bridges', 'Squeeze at the top for a full second.'], ['Forearm plank', 'Ribs down, squeeze glutes.'], ['Slow mountain climbers', 'Controlled knees to chest.']] }) });
+  add('home', '20-Minute Fat Burner', { lvl: 'Intermediate', eq: 'None', desc: 'High-energy intervals that keep your heart rate up. 40 seconds on, 20 seconds off.',
+    steps: circ({ work: 40, rest: 20, rounds: 3, rr: 45, ex: ['High knees', 'Squat jumps', 'Push-ups', 'Reverse lunges', 'Burpees', 'Bicycle crunches'] }) });
+  add('home', 'Lower Body Burn', { lvl: 'Intermediate', eq: 'None', desc: 'Legs and glutes with no equipment. Feel it in the best way.',
+    steps: circ({ work: 45, rest: 15, rounds: 3, rr: 45, ex: [['Squats', 'Heels down, push the floor away.'], ['Reverse lunges', 'Alternate legs. Back knee hovers.'], ['Glute bridges', 'Drive through your heels.'], ['Curtsy lunges', 'Cross behind, stay tall.'], ['Wall sit', 'Thighs parallel to the floor.'], ['Donkey kicks', 'Alternate sides at a steady pace.']] }) });
+  add('home', 'Upper Body and Core', { lvl: 'Intermediate', eq: 'A sturdy chair', desc: 'Arms, shoulders, back and abs with just your bodyweight.',
+    steps: circ({ work: 40, rest: 20, rounds: 3, rr: 45, ex: [['Push-ups', 'Drop to your knees when form slips.'], ['Chair tricep dips', 'Elbows point straight back.'], ['Plank shoulder taps', 'Keep hips still.'], ['Pike push-ups', 'Hips high, head between arms.'], ['Superman holds', 'Lift chest and legs, breathe.'], ['Dead bugs', 'Low back stays on the floor.']] }) });
+  add('home', 'Cardio Dance Party', { lvl: 'All levels', eq: 'None', desc: 'Turn up your favorite playlist. Big moves, big smiles.',
+    steps: circ({ work: 45, rest: 15, rounds: 3, rr: 30, ex: ['Step touch with arm reach', 'Grapevine', 'Skaters', 'Jumping jacks', 'Knee drivers', 'Shadow boxing', 'Fast feet', 'Hip circles and shimmy'] }) });
+  add('home', 'Low-Impact Apartment Sweat', { lvl: 'Beginner', eq: 'None', desc: 'No jumping and quiet for neighbors, but still a real sweat.',
+    steps: circ({ work: 40, rest: 20, rounds: 3, rr: 30, ex: ['Fast march in place', 'Squat to calf raise', 'Standing knee-to-elbow crunch', 'Reverse lunges', 'Wall push-ups', 'Side-lying leg lifts', 'Plank to downward dog', 'Standing oblique crunch'] }) });
+  add('home', '10-Minute Morning Wake-Up', { lvl: 'Beginner', eq: 'None', desc: 'Short and energizing. Get your blood flowing before the day starts.',
+    steps: circ({ work: 40, rest: 15, rounds: 2, rr: 20, warm: 30, cool: 45, ex: ['Arm circles and march', 'Squats', 'Incline push-ups', 'Reverse lunges', 'Plank hold'] }) });
+  add('home', 'Tabata Core Crusher', { lvl: 'Advanced', eq: 'Mat', desc: 'Four tabata blocks: 20 seconds on, 10 seconds off, 8 rounds each.',
+    steps: tabata(['Mountain climbers', 'Bicycle crunches', 'Plank jacks', 'Russian twists']) });
+  add('home', 'Booty and Abs 15', { lvl: 'Intermediate', eq: 'Mat', desc: 'Two quick targets in one short session.',
+    steps: circ({ work: 40, rest: 20, rounds: 2, rr: 30, ex: ['Glute bridges', 'Fire hydrants (right)', 'Fire hydrants (left)', 'Sumo squats', 'Reverse crunches', 'Heel taps', 'Plank hold'] }) });
+
+  /* ---------- OUTSIDE ---------- */
+  add('outside', 'Mile Builder (Run/Walk)', { lvl: 'Beginner', eq: 'Shoes, fresh air', desc: 'Short run segments with walking breaks. Roughly a mile of running, plus warm-up and cool-down. Log your distance in the Run tab.',
+    steps: ints([['w', 'Brisk walk', 300, 'Loosen up. Stand tall.']].concat(rep(6, [['k', 'Run', 60, 'Easy pace. You should be able to talk.'], ['r', 'Walk', 90, 'Catch your breath.']]), [['c', 'Cool-down walk', 240, 'Slow it down and breathe.']])) });
+  add('outside', 'Power Walk Intervals', { lvl: 'Beginner', eq: 'Shoes', desc: 'Alternate fast and easy walking. Easy on the joints, great for the heart.',
+    steps: ints([['w', 'Easy walk', 300, 'Shoulders relaxed.']].concat(rep(5, [['k', 'Fast walk', 180, 'Long stride, swing your arms.'], ['r', 'Easy walk', 120, 'Recover.']]), [['c', 'Cool-down walk', 180, 'Gentle pace.']])) });
+  add('outside', 'Couch to Mile: Week 1', { lvl: 'Beginner', eq: 'Shoes', desc: 'The classic starter plan. Short jogs, longer walks, lots of progress.',
+    steps: ints([['w', 'Brisk walk', 300, 'Easy and relaxed.']].concat(rep(8, [['k', 'Jog', 60, 'Slow and steady.'], ['r', 'Walk', 120, 'Recover fully.']]), [['c', 'Cool-down walk', 180]])) });
+  add('outside', 'Steady Run: A Mile or More', { lvl: 'Intermediate', eq: 'Shoes', desc: 'Twenty minutes of easy running, checked in five-minute chunks.',
+    steps: ints([['w', 'Brisk walk', 300, 'Get loose.'], ['k', 'Easy run (1 of 4)', 300, 'Conversational pace.'], ['k', 'Easy run (2 of 4)', 300, 'Relax your shoulders.'], ['k', 'Easy run (3 of 4)', 300, 'Quick, light steps.'], ['k', 'Easy run (4 of 4)', 300, 'Finish proud.'], ['c', 'Cool-down walk', 300, 'Slow it down.']]) });
+  add('outside', 'Fartlek Fun', { lvl: 'Intermediate', eq: 'Shoes', desc: 'Surge for a minute, float for two. Playful speed work.',
+    steps: ints([['w', 'Easy jog or walk', 300, 'Warm up gradually.']].concat(rep(8, [['k', 'Surge', 60, 'Pick it up!'], ['r', 'Easy jog', 120, 'Float and breathe.']]), [['c', 'Cool-down walk', 300]])) });
+  add('outside', 'Hill Repeats', { lvl: 'Advanced', eq: 'A hill', desc: 'Find a hill. Climb hard, walk down easy, repeat.',
+    steps: ints([['w', 'Easy jog or walk', 480, 'Warm up well before climbing.']].concat(rep(6, [['k', 'Hill climb', 45, 'Drive your knees, lean slightly forward.'], ['r', 'Walk down', 90, 'Easy walk back to the start.']]), [['c', 'Cool-down walk', 300]])) });
+  add('outside', 'Tempo Run', { lvl: 'Advanced', eq: 'Shoes', desc: 'Twelve minutes comfortably hard. Builds speed and stamina.',
+    steps: ints([['w', 'Easy jog', 300, 'Gentle warm-up.'], ['k', 'Tempo (1 of 4)', 180, 'Comfortably hard. Short sentences only.'], ['k', 'Tempo (2 of 4)', 180, 'Hold the same effort.'], ['k', 'Tempo (3 of 4)', 180, 'Stay smooth.'], ['k', 'Tempo (4 of 4)', 180, 'Finish strong.'], ['c', 'Cool-down walk', 300, 'Breathe it out.']]) });
+  add('outside', 'Speed Ladder', { lvl: 'Intermediate', eq: 'Shoes', desc: 'Climb up and down a ladder of 1, 2, 3, 2 and 1 minute efforts.',
+    steps: ints([['w', 'Easy jog or walk', 300],
+      ['k', 'Fast: 1 minute', 60, 'Quick feet.'], ['r', 'Easy', 60], ['k', 'Fast: 2 minutes', 120, 'Hold the pace.'], ['r', 'Easy', 90],
+      ['k', 'Fast: 3 minutes', 180, 'Top of the ladder. Stay tall.'], ['r', 'Easy', 120], ['k', 'Fast: 2 minutes', 120, 'Heading down.'], ['r', 'Easy', 90],
+      ['k', 'Fast: 1 minute', 60, 'Last one. Empty the tank.'], ['c', 'Cool-down walk', 240]]) });
+  add('outside', 'Easy Long Walk', { lvl: 'Beginner', eq: 'Shoes, water', desc: 'Forty minutes of steady walking with hydration check-ins.',
+    steps: ints([['w', 'Easy start', 300, 'Settle into your stride.'], ['k', 'Steady walk (1 of 4)', 600, 'Brisk but comfortable.'], ['k', 'Steady walk (2 of 4)', 600, 'Check posture. Sip water.'], ['k', 'Steady walk (3 of 4)', 600, 'Swing your arms.'], ['k', 'Steady walk (4 of 4)', 600, 'Almost there.'], ['c', 'Cool-down', 180, 'Slow and stretch.']]) });
+  add('outside', '5K Race Prep', { lvl: 'Advanced', eq: 'Shoes', desc: 'Race-pace efforts with easy jog recoveries.',
+    steps: ints([['w', 'Easy jog', 480, 'Add a few strides at the end.']].concat(rep(4, [['k', '5K effort', 180, 'Controlled, strong, relaxed.'], ['r', 'Easy jog', 90, 'Recover.']]), [['c', 'Cool-down walk', 360]])) });
+
+  /* ---------- TREADMILL (incline capped at 15) ---------- */
+  add('tread', '12-3-30 Incline Walk', { lvl: 'Intermediate', eq: 'Treadmill', desc: 'Twelve percent incline, 3.0 mph, thirty minutes. Skip the handrails if you can.',
+    steps: tm([['w', 180, 2.5, 5, 'Warm-up']].concat(rep(6, [['k', 300, 3.0, 12, 'Climb']]), [['c', 180, 2.0, 0, 'Cool-down']])) });
+  add('tread', 'Incline Ladder to 15%', { lvl: 'Intermediate', eq: 'Treadmill', desc: 'Climb to the maximum 15 percent incline, then come back down.',
+    steps: tm([['w', 180, 2.5, 0, 'Warm-up'], ['k', 120, 3.0, 3, 'Climb'], ['k', 120, 3.0, 5, 'Climb'], ['k', 120, 3.0, 7, 'Climb'], ['k', 120, 3.0, 9, 'Climb'], ['k', 120, 3.0, 11, 'Climb'], ['k', 120, 3.0, 13, 'Climb'], ['k', 120, 3.0, 15, 'Max incline'],
+      ['r', 90, 3.2, 10, 'Step down'], ['r', 90, 3.2, 6, 'Step down'], ['r', 90, 3.2, 3, 'Step down'], ['c', 180, 2.0, 0, 'Cool-down']]) });
+  add('tread', 'Hill Climb Intervals', { lvl: 'Intermediate', eq: 'Treadmill', desc: 'Six climbs and six recoveries, with a 15 percent finisher.',
+    steps: tm([['w', 240, 3.0, 2, 'Warm-up']].concat(rep(6, [['k', 120, 3.4, 10, 'Climb'], ['r', 90, 3.0, 2, 'Recover']]), [['k', 60, 2.8, 15, 'Max incline finisher'], ['c', 180, 2.0, 0, 'Cool-down']])) });
+  add('tread', 'Walk-Run Mile Builder', { lvl: 'Beginner', eq: 'Treadmill', desc: 'Jog for a minute, walk for two. A friendly path to running a full mile.',
+    steps: tm([['w', 300, 3.5, 1, 'Warm-up']].concat(rep(8, [['k', 60, 5.0, 1, 'Jog'], ['r', 120, 3.5, 1, 'Walk']]), [['c', 240, 3.0, 0, 'Cool-down']])) });
+  add('tread', 'Max Incline Power Walk (15%)', { lvl: 'Advanced', eq: 'Treadmill', desc: 'Three-minute climbs at 15 percent. Glutes and calves will notice.',
+    steps: tm([['w', 240, 2.5, 5, 'Warm-up']].concat(rep(5, [['k', 180, 2.8, 15, 'Max climb'], ['r', 120, 2.5, 5, 'Recover']]), [['c', 240, 2.0, 0, 'Cool-down']])) });
+  add('tread', 'Sprint Intervals', { lvl: 'Advanced', eq: 'Treadmill', desc: 'Eight thirty-second sprints with long recoveries. Hold the rails only when changing speed.',
+    steps: tm([['w', 300, 4.0, 1, 'Warm-up']].concat(rep(8, [['k', 30, 7.5, 1, 'Sprint'], ['r', 90, 3.5, 1, 'Recover']]), [['c', 240, 3.0, 0, 'Cool-down']])) });
+  add('tread', 'Beginner Incline Walk', { lvl: 'Beginner', eq: 'Treadmill', desc: 'Gentle incline steps for twenty minutes. Easy on the knees.',
+    steps: tm([['w', 180, 2.5, 0, 'Warm-up'], ['k', 240, 3.0, 3, 'Climb'], ['k', 240, 3.0, 5, 'Climb'], ['k', 240, 3.0, 7, 'Climb'], ['k', 240, 3.0, 5, 'Ease down'], ['c', 180, 2.0, 0, 'Cool-down']]) });
+  add('tread', 'Mile+ Run Builder (1 to 3 miles)', { lvl: 'Intermediate', eq: 'Treadmill', desc: 'Each ten-minute block at 6.0 mph is one mile. Do one, two or three. End any time and save it.',
+    steps: tm([['w', 300, 3.5, 1, 'Warm-up'], ['k', 600, 6.0, 1, 'Mile 1'], ['k', 600, 6.0, 1, 'Mile 2'], ['k', 600, 6.0, 1, 'Mile 3'], ['c', 240, 3.0, 0, 'Cool-down']]) });
+  add('tread', 'Rolling Hills Run', { lvl: 'Advanced', eq: 'Treadmill', desc: 'Rolling incline changes while you run at a steady 5.5 mph.',
+    steps: tm([['w', 300, 3.5, 1, 'Warm-up']].concat(rep(4, [['k', 120, 5.5, 1, 'Flat'], ['k', 120, 5.5, 3, 'Roll'], ['k', 120, 5.5, 5, 'Hill'], ['k', 120, 5.5, 3, 'Roll']]), [['c', 240, 3.0, 0, 'Cool-down']])) });
+  add('tread', '5K Prep Steady Run', { lvl: 'Intermediate', eq: 'Treadmill', desc: 'Thirty minutes at 5.5 mph is about 2.75 miles. Add a few minutes for a full 5K.',
+    steps: tm([['w', 300, 3.5, 1, 'Warm-up']].concat(rep(6, [['k', 300, 5.5, 1, 'Steady']]), [['c', 240, 3.0, 0, 'Cool-down']])) });
+
+  /* ---------- GYM ---------- */
+  var G = 'gym';
+  add(G, 'Push Day: Chest, Shoulders, Triceps', { grp: 'Upper body', lvl: 'Intermediate', eq: 'Barbell, dumbbells, cable', desc: 'Classic push session. Rest timers keep you honest.',
+    steps: lift({ items: [['Bench press', 4, '8 reps', 90], ['Incline dumbbell press', 3, '10 reps', 75], ['Overhead press', 3, '8 reps', 75], ['Lateral raises', 3, '12 reps', 45], ['Cable tricep pushdown', 3, '12 reps', 45], ['Cable chest fly', 3, '12 reps', 45]] }) });
+  add(G, 'Pull Day: Back and Biceps', { grp: 'Upper body', lvl: 'Intermediate', eq: 'Cable, dumbbells', desc: 'Build a strong back and shapely arms.',
+    steps: lift({ items: [['Lat pulldown', 4, '10 reps', 75], ['Seated cable row', 4, '10 reps', 75], ['Single-arm dumbbell row', 3, '10 reps each side', 60], ['Face pulls', 3, '15 reps', 45], ['Dumbbell curls', 3, '12 reps', 45], ['Hammer curls', 3, '12 reps', 45]] }) });
+  add(G, 'Dumbbell Upper Body Sculpt', { grp: 'Upper body', lvl: 'Beginner', eq: 'Dumbbells, bench', desc: 'Light to medium weights, smooth reps and great shape.',
+    steps: lift({ items: [['Dumbbell chest press', 3, '12 reps', 60], ['Bent-over row', 3, '12 reps', 60], ['Shoulder press', 3, '10 reps', 60], ['Lateral raises', 2, '15 reps', 45], ['Bicep curls', 2, '12 reps', 45], ['Overhead tricep extension', 2, '12 reps', 45]] }) });
+  add(G, 'Arms and Shoulders Pump', { grp: 'Upper body', lvl: 'Intermediate', eq: 'Dumbbells, cable', desc: 'Short and focused. Perfect after a long day.',
+    steps: lift({ warm: 240, items: [['Arnold press', 3, '10 reps', 60], ['Rear delt fly', 3, '15 reps', 45], ['EZ-bar curl', 3, '10 reps', 60], ['Rope tricep pushdown', 3, '12 reps', 45], ['Front raise', 2, '12 reps', 45]] }) });
+  add(G, 'Machine Upper Body Starter', { grp: 'Upper body', lvl: 'Beginner', eq: 'Gym machines', desc: 'Stable machines to learn the movements with confidence.',
+    steps: lift({ items: [['Chest press machine', 3, '12 reps', 60], ['Seated row machine', 3, '12 reps', 60], ['Shoulder press machine', 3, '12 reps', 60], ['Lat pulldown', 3, '12 reps', 60], ['Pec deck', 2, '15 reps', 45]] }) });
+  add(G, 'Upper Body Superset Express', { grp: 'Upper body', lvl: 'Advanced', eq: 'Dumbbells, cable', desc: 'Pairs with short rests. Efficient and intense.',
+    steps: lift({ setSecs: 40, items: [['Dumbbell bench press', 4, '10 reps', 20], ['Chest-supported row', 4, '10 reps', 60], ['Lateral raises', 3, '15 reps', 20], ['Face pulls', 3, '15 reps', 45], ['Curl to press', 3, '10 reps', 20], ['Overhead tricep extension', 3, '12 reps', 45]] }) });
+
+  add(G, 'Quad and Glute Strength', { grp: 'Lower body', lvl: 'Intermediate', eq: 'Barbell, machines', desc: 'Squat-based leg day with solid volume.',
+    steps: lift({ items: [['Back squat', 4, '8 reps', 90], ['Leg press', 3, '12 reps', 75], ['Walking lunges', 3, '10 steps each leg', 60], ['Leg extension', 3, '12 reps', 45], ['Standing calf raises', 4, '15 reps', 45]] }) });
+  add(G, 'Hamstring and Glute Builder', { grp: 'Lower body', lvl: 'Intermediate', eq: 'Barbell, cable, machines', desc: 'Hinge and thrust focus for a strong posterior chain.',
+    steps: lift({ items: [['Romanian deadlift', 4, '8 reps', 90], ['Barbell hip thrust', 4, '10 reps', 75], ['Lying leg curl', 3, '12 reps', 60], ['Bulgarian split squat', 3, '8 reps each leg', 60], ['Cable kickback', 3, '12 reps each leg', 45], ['Hip abductor machine', 3, '15 reps', 45]] }) });
+  add(G, 'Glute Focus Hip Thrust Day', { grp: 'Lower body', lvl: 'Intermediate', eq: 'Barbell, bench, bands', desc: 'All glutes, all the time.',
+    steps: lift({ items: [['Hip thrust', 4, '10 reps', 90], ['Sumo squat', 3, '12 reps', 75], ['Step-ups', 3, '10 reps each leg', 60], ['Banded lateral walk', 3, '15 steps each way', 45], ['Glute bridge hold', 3, '45 seconds', 45]] }) });
+  add(G, 'Machine Lower Body Starter', { grp: 'Lower body', lvl: 'Beginner', eq: 'Gym machines', desc: 'Safe, guided leg work to build confidence.',
+    steps: lift({ items: [['Leg press', 3, '12 reps', 60], ['Seated leg curl', 3, '12 reps', 60], ['Leg extension', 3, '12 reps', 60], ['Hip adductor machine', 2, '15 reps', 45], ['Seated calf raise', 2, '15 reps', 45]] }) });
+  add(G, 'Dumbbell Leg Day Burnout', { grp: 'Lower body', lvl: 'Intermediate', eq: 'Dumbbells, bench', desc: 'Dumbbells only. Surprisingly spicy.',
+    steps: lift({ items: [['Goblet squat', 4, '12 reps', 60], ['Dumbbell reverse lunge', 3, '10 reps each leg', 60], ['Stiff-leg deadlift', 3, '10 reps', 60], ['Dumbbell step-ups', 3, '10 reps each leg', 60], ['Side lunges', 2, '10 reps each side', 45], ['Calf raises', 3, '20 reps', 30]] }) });
+  add(G, 'Lower Body Express', { grp: 'Lower body', lvl: 'Intermediate', eq: 'Dumbbells, machines', desc: 'Thirty minutes, no wasted time.',
+    steps: lift({ warm: 240, setSecs: 40, items: [['Goblet squat', 3, '12 reps', 45], ['Romanian deadlift', 3, '10 reps', 45], ['Walking lunges', 2, '10 steps each leg', 45], ['Leg curl', 2, '12 reps', 45], ['Calf raises', 2, '20 reps', 30]] }) });
+
+  add(G, 'Full-Body Strength A', { grp: 'Full body', lvl: 'Intermediate', eq: 'Barbell, dumbbells', desc: 'Compound lifts for strength everywhere.',
+    steps: lift({ items: [['Back squat', 3, '8 reps', 90], ['Bench press', 3, '8 reps', 90], ['Bent-over row', 3, '10 reps', 75], ['Overhead press', 3, '8 reps', 75], ['Romanian deadlift', 3, '8 reps', 75], ['Plank', 3, '45 seconds', 45]] }) });
+  add(G, 'Full-Body Strength B', { grp: 'Full body', lvl: 'Intermediate', eq: 'Barbell, dumbbells, bench', desc: 'The partner to Strength A. Alternate them through the week.',
+    steps: lift({ items: [['Deadlift', 3, '5 reps', 120], ['Incline dumbbell press', 3, '10 reps', 75], ['Pull-ups or assisted pull-ups', 3, 'as many as you can with control', 90], ['Walking lunges', 3, '10 steps each leg', 60], ['Face pulls', 3, '15 reps', 45], ['Hanging knee raises', 3, '12 reps', 45]] }) });
+  add(G, 'Dumbbell Full-Body Circuit', { grp: 'Full body', lvl: 'Intermediate', eq: 'Dumbbells', desc: 'One pair of dumbbells, thirty-five minutes, full body.',
+    steps: circ({ work: 40, rest: 20, rounds: 3, rr: 45, ex: ['Goblet squat', 'Dumbbell thrusters', 'Renegade rows', 'Romanian deadlift', 'Push-ups', 'Reverse lunges', 'Overhead press'] }) });
+  add(G, 'Kettlebell Full-Body Burn', { grp: 'Full body', lvl: 'Advanced', eq: 'Kettlebell', desc: 'Swings, squats and presses to light up your whole body.',
+    steps: circ({ work: 40, rest: 20, rounds: 3, rr: 45, ex: [['Kettlebell swings', 'Hinge hard. Hips do the work.'], ['Goblet squats', 'Elbows inside the knees.'], ['Clean and press', 'Smooth rack, strong press.'], ['Single-arm row', 'Switch sides halfway.'], ['Farmer carry in place', 'Heavy and tall.'], ['Russian twists', 'Chest up.']] }) });
+  add(G, 'Machine Full-Body Starter', { grp: 'Full body', lvl: 'Beginner', eq: 'Gym machines', desc: 'Your first complete gym workout. Simple and safe.',
+    steps: lift({ items: [['Leg press', 2, '12 reps', 60], ['Chest press machine', 2, '12 reps', 60], ['Seated row machine', 2, '12 reps', 60], ['Shoulder press machine', 2, '12 reps', 60], ['Seated leg curl', 2, '12 reps', 60], ['Cable crunch', 2, '15 reps', 45]] }) });
+  add(G, 'Strength Plus Cardio Finisher', { grp: 'Full body', lvl: 'Advanced', eq: 'Barbell, rower or bike', desc: 'Heavy basics, then a six-minute finishing sprint.',
+    steps: lift({ items: [['Back squat', 3, '6 reps', 90], ['Bench press', 3, '6 reps', 90], ['Barbell row', 3, '8 reps', 75]] }).slice(0, -1).concat(
+      [S_('rest', 'Rest', 60, { tip: 'Hop on the rower, bike or ski erg.' })],
+      rep(6, [S_('work', 'Hard effort', 30, { tip: 'All out on the machine.' }), S_('rest', 'Easy spin', 30)]).slice(0, -1),
+      [S_('cool', 'Cool-down stretch', 180, { tip: 'Slow breathing. Stretch everything you used.' })]) });
+
+  /* ---------- F45 STYLE ---------- */
+  add('f45', 'Cardio Crush', { lvl: 'Intermediate', eq: 'Dumbbells, mat', desc: 'Ten stations, 40 seconds on, 20 seconds to change. Twice through.',
+    steps: circ({ work: 40, rest: 20, rounds: 2, rr: 60, ex: ['Burpees', 'High knees', 'Mountain climbers', 'Dumbbell thrusters', 'Skater hops', 'Jump squats', 'Fast arm slams or air jump rope', 'Sprint in place', 'Box or step-ups', 'Plank jacks'] }) });
+  add('f45', 'Strength Stack', { lvl: 'Intermediate', eq: 'Dumbbells, bench', desc: 'Ten strength stations, three rounds. 45 seconds on, 15 off.',
+    steps: circ({ work: 45, rest: 15, rounds: 3, rr: 45, ex: ['Goblet squat', 'Bent-over row', 'Push-ups', 'Reverse lunges', 'Overhead press', 'Romanian deadlift', 'Renegade row', 'Glute bridge march', 'Hammer curl to press', 'Plank hold'] }) });
+  add('f45', 'Legs and Glutes Blitz', { lvl: 'Intermediate', eq: 'Dumbbells, band', desc: 'Nine leg stations to leave you wobbling.',
+    steps: circ({ work: 40, rest: 20, rounds: 3, rr: 45, ex: ['Sumo squat pulses', 'Alternating lunges', 'Single-leg deadlift (right)', 'Single-leg deadlift (left)', 'Banded lateral walks', 'Jump squats', 'Step-ups', 'Glute bridge with weight', 'Wall sit'] }) });
+  add('f45', 'Upper Body Fire', { lvl: 'Intermediate', eq: 'Dumbbells', desc: 'Push, pull and press stations with a core finisher each round.',
+    steps: circ({ work: 40, rest: 20, rounds: 3, rr: 45, ex: ['Dumbbell bench press or floor press', 'Bent-over row', 'Arnold press', 'Push-ups', 'Bicep curl to press', 'Tricep kickbacks', 'Lateral raises', 'Plank to push-up'] }) });
+  add('f45', 'Full-Body Hybrid', { lvl: 'Advanced', eq: 'Dumbbells, bench, mat', desc: 'Twelve stations mixing cardio and strength. Three rounds. This one is a challenge.',
+    steps: circ({ work: 40, rest: 20, rounds: 3, rr: 60, ex: ['Burpee to press', 'Goblet squat', 'Bent-over row', 'Mountain climbers', 'Reverse lunges', 'Push-ups', 'Jump squats', 'Romanian deadlift', 'Skater hops', 'Dumbbell snatch (right)', 'Dumbbell snatch (left)', 'Plank hold'] }) });
+  add('f45', 'Core Inferno', { lvl: 'Intermediate', eq: 'Mat', desc: 'Eight core stations, three rounds, zero mercy.',
+    steps: circ({ work: 40, rest: 20, rounds: 3, rr: 30, ex: ['Bicycle crunches', 'Plank hold', 'Russian twists', 'Leg raises', 'Mountain climbers', 'Side plank (right)', 'Side plank (left)', 'Dead bugs'] }) });
+  add('f45', 'Quick Hit Ladder', { lvl: 'Beginner', eq: 'Dumbbells (optional)', desc: 'Twenty-five minutes. Five stations, five rounds.',
+    steps: circ({ work: 40, rest: 20, rounds: 4, rr: 30, ex: ['Squat to press', 'Push-ups', 'Reverse lunges', 'Mountain climbers', 'Plank hold'] }) });
+
+  /* ---------- PILATES ---------- */
+  add('pilates', 'Classic Mat Basics', { lvl: 'Beginner', eq: 'Mat', desc: 'The foundations of mat Pilates. Control, breath and precision.',
+    steps: seq([['Breathing and pelvic tilts', 60, 'Inhale ribs wide, exhale tilt the pelvis.', 'w'], ['The Hundred', 60, 'Curl up, arms pump, inhale five, exhale five.'], ['Roll-up', 60, 'Peel up one vertebra at a time.'], ['Single-leg circles (right)', 30, 'Keep the pelvis still.'], ['Single-leg circles (left)', 30], ['Rolling like a ball', 45, 'Balance on your sit bones.'], ['Single-leg stretch', 60, 'Switch legs with control.'], ['Double-leg stretch', 45, 'Reach long, circle arms.'], ['Scissors', 45, 'Lower abs engaged.'], ['Criss-cross', 60, 'Rotate from the ribs.'], ['Spine stretch forward', 45, 'Round like a C.'], ['Swimming', 45, 'Long neck, flutter strong.'], ['Bridge', 60, 'Press the feet, lift the hips.'], ['Mermaid stretch', 60, 'Reach over and breathe into the side.'], ['Child\'s pose', 45, 'Melt and breathe.', 'c']], 'k') });
+  add('pilates', 'Core Control', { lvl: 'Intermediate', eq: 'Mat', desc: 'Fifteen minutes of focused abdominal work.',
+    steps: seq([['Breath and ribcage closure', 45, 'Draw the ribs together on the exhale.', 'w'], ['The Hundred', 60], ['Roll-up', 60], ['Single-leg stretch', 60], ['Double-leg stretch', 60], ['Criss-cross', 60], ['Teaser prep', 60, 'Peel up, keep the legs still.'], ['Plank to pike', 45, 'Move from the core, not the shoulders.'], ['Side plank (right)', 30], ['Side plank (left)', 30], ['Swan prep', 45, 'Lengthen forward.'], ['Cat-cow', 45, 'Wave through the spine.', 'c']], 'k') });
+  add('pilates', 'Glute and Thigh Sculpt', { lvl: 'Intermediate', eq: 'Mat', desc: 'The side-lying series plus bridging for lower-body shape.',
+    steps: seq([['Pelvic tilts', 45, 'Find your neutral spine.', 'w'], ['Bridge', 60], ['Single-leg bridge (right)', 45], ['Single-leg bridge (left)', 45], ['Side kicks front and back (right)', 60, 'Top hip stays stacked.'], ['Side kicks front and back (left)', 60], ['Side leg lifts (right)', 45], ['Side leg lifts (left)', 45], ['Clamshells (right)', 45], ['Clamshells (left)', 45], ['Inner thigh lifts (right)', 40], ['Inner thigh lifts (left)', 40], ['Donkey kicks', 60], ['Child\'s pose', 45, 'Breathe into the back.', 'c']], 'k') });
+  add('pilates', 'Full-Body Pilates Flow', { lvl: 'Intermediate', eq: 'Mat', desc: 'A complete mat session from the first breath to the final stretch.',
+    steps: seq([['Breathing and imprint', 60, 'Long spine, soft ribs.', 'w'], ['The Hundred', 60], ['Roll-up', 60], ['Roll-over prep', 45], ['Single-leg circles (right)', 30], ['Single-leg circles (left)', 30], ['Rolling like a ball', 45], ['Single-leg stretch', 60], ['Double-leg stretch', 60], ['Scissors', 45], ['Criss-cross', 60], ['Spine stretch forward', 45], ['Saw (right)', 40], ['Saw (left)', 40], ['Swan prep', 45], ['Swimming', 45], ['Plank hold', 45], ['Push-up with elbows tight', 45], ['Bridge', 60], ['Side kick series (right)', 60], ['Side kick series (left)', 60], ['Teaser', 60], ['Mermaid stretch', 60], ['Spine twist', 45], ['Child\'s pose', 60, 'Final breaths.', 'c']], 'k') });
+  add('pilates', 'Pilates Wake-Up', { lvl: 'Beginner', eq: 'Mat', desc: 'Eight minutes to wake up the spine and center.',
+    steps: seq([['Breathing and pelvic tilts', 45, 'Slow and smooth.', 'w'], ['Cat-cow', 45], ['The Hundred prep', 45], ['Single-leg stretch', 45], ['Bridge', 45], ['Side-lying leg lifts (right)', 30], ['Side-lying leg lifts (left)', 30], ['Swimming', 30], ['Spine stretch forward', 45], ['Mermaid stretch', 60], ['Child\'s pose', 45, 'Close with breath.', 'c']], 'k') });
+  add('pilates', 'Standing Pilates (Low Impact)', { lvl: 'Beginner', eq: 'None', desc: 'No mat needed. Great for small spaces and sore wrists.',
+    steps: seq([['Standing breathing and posture', 45, 'Stack ribs over hips.', 'w'], ['Standing roll-down', 45, 'One vertebra at a time.'], ['Plié squats', 60, 'Heels together, knees wide.'], ['Standing leg circles (right)', 40], ['Standing leg circles (left)', 40], ['Standing side leg lifts (right)', 40], ['Standing side leg lifts (left)', 40], ['Standing hundreds', 60, 'Pump arms by your sides.'], ['Standing oblique crunch (right)', 40], ['Standing oblique crunch (left)', 40], ['Single-leg balance (right)', 40], ['Single-leg balance (left)', 40], ['Arm circles with core brace', 45], ['Standing side bend', 45], ['Forward fold', 45, 'Hang and breathe.', 'c']], 'k') });
+  add('pilates', 'Pilates Plus Stretch', { lvl: 'All levels', eq: 'Mat', desc: 'Twelve minutes of Pilates followed by twelve of deep stretching.',
+    steps: seq([['Breathing and pelvic tilts', 45, 'Ease in.', 'w'], ['The Hundred', 60], ['Roll-up', 60], ['Single-leg stretch', 60], ['Criss-cross', 60], ['Bridge', 60], ['Side kick series (right)', 60], ['Side kick series (left)', 60], ['Swimming', 45],
+      ['Hip flexor stretch (right)', 60, 'Tuck the tailbone.', 'c'], ['Hip flexor stretch (left)', 60, null, 'c'], ['Figure-four stretch (right)', 60, 'Ease the knee open.', 'c'], ['Figure-four stretch (left)', 60, null, 'c'], ['Seated forward fold', 60, 'Reach long, not low.', 'c'], ['Child\'s pose', 60, 'Surrender.', 'c']], 'k') });
+
+  /* ---------- YOGA ---------- */
+  var SUNA = [['Mountain pose', 20, 'Ground through all ten toes.'], ['Reach up', 15, 'Inhale, sweep arms overhead.'], ['Forward fold', 20, 'Exhale, soft knees.'], ['Halfway lift', 15, 'Inhale, flat back.'], ['Low plank to chaturanga', 20, 'Exhale, elbows hug the ribs.'], ['Upward dog', 15, 'Inhale, roll over the toes.'], ['Downward dog', 30, 'Exhale, press the floor away. Five breaths.']];
+  add('yoga', 'Sun Salutation Flow', { lvl: 'Beginner', eq: 'Mat', desc: 'Three rounds of the classic flow to build heat and rhythm.',
+    steps: seq([['Centering breath', 45, 'Close your eyes. Slow nose breaths.', 'w']].concat(
+      SUNA.map(function (e) { return [e[0] + ' (round 1)', e[1], e[2]]; }),
+      SUNA.map(function (e) { return [e[0] + ' (round 2)', e[1], e[2]]; }),
+      SUNA.map(function (e) { return [e[0] + ' (round 3)', e[1], e[2]]; }),
+      [['Standing forward fold', 45, 'Let the head hang heavy.'], ['Seated twist (right)', 30, null, 'c'], ['Seated twist (left)', 30, null, 'c'], ['Savasana', 90, 'Release everything.', 'c']]), 'h') });
+  add('yoga', 'Morning Energize', { lvl: 'Beginner', eq: 'Mat', desc: 'A bright seven-minute wake-up that opens the body.',
+    steps: seq([['Easy seat and deep breaths', 45, 'Inhale arms up, exhale hands to heart.', 'w'], ['Cat-cow', 60, 'Move with your breath.'], ['Downward dog', 45, 'Pedal the feet.'], ['Low lunge (right)', 40, 'Sink the hips.'], ['Low lunge (left)', 40], ['Chair pose', 30, 'Sit back and reach tall.'], ['Warrior II (right)', 30, 'Front knee over ankle.'], ['Warrior II (left)', 30], ['Standing forward fold', 40], ['Mountain pose', 30, 'Smile and breathe.', 'c']], 'h') });
+  add('yoga', 'Hips and Hamstrings', { lvl: 'All levels', eq: 'Mat, strap (optional)', desc: 'Long, slow holds for tight hips and legs.',
+    steps: seq([['Easy seat and breath', 60, 'Settle in.', 'w'], ['Cat-cow', 60], ['Low lunge (right)', 60, 'Let gravity do the work.'], ['Half splits (right)', 60, 'Flex the front foot.'], ['Low lunge (left)', 60], ['Half splits (left)', 60], ['Pigeon (right)', 90, 'Fold forward if comfortable.'], ['Pigeon (left)', 90], ['Happy baby', 60, 'Rock gently side to side.'], ['Seated forward fold', 75, 'Reach for your shins.'], ['Supine twist (right)', 45, null, 'c'], ['Supine twist (left)', 45, null, 'c'], ['Savasana', 120, 'Let the floor hold you.', 'c']], 'h') });
+  add('yoga', 'Power Yoga', { lvl: 'Advanced', eq: 'Mat', desc: 'Strong, sweaty and still mindful. Thirty minutes of flowing strength.',
+    steps: seq([['Mountain pose breath', 45, 'Ground yourself.', 'w']].concat(
+      SUNA.map(function (e) { return [e[0] + ' (A)', e[1], e[2]]; }),
+      [['Chair pose', 40, 'Squeeze the knees together.'], ['Warrior I (right)', 40, 'Back heel grounded.'], ['Warrior II (right)', 40], ['Reverse warrior (right)', 30], ['Side angle (right)', 40], ['Plank', 30, 'Draw the navel in.'], ['Chaturanga to downward dog', 30], ['Chair pose', 40], ['Warrior I (left)', 40], ['Warrior II (left)', 40], ['Reverse warrior (left)', 30], ['Side angle (left)', 40], ['Plank', 30], ['Chaturanga to downward dog', 30], ['Boat pose', 45, 'Chest lifted, long spine.'], ['Bridge', 45], ['Wheel or bridge hold', 30], ['Happy baby', 45, null, 'c'], ['Supine twist (right)', 40, null, 'c'], ['Supine twist (left)', 40, null, 'c'], ['Savasana', 120, 'Total release.', 'c']]), 'h') });
+  add('yoga', 'Evening Wind-Down', { lvl: 'Beginner', eq: 'Mat, blanket', desc: 'Slow stretches and a long rest to prepare you for sleep.',
+    steps: seq([['Easy seat and slow breaths', 60, 'Exhale longer than you inhale.', 'w'], ['Cat-cow', 60], ['Child\'s pose', 90, 'Forehead down.'], ['Thread the needle (right)', 45], ['Thread the needle (left)', 45], ['Low lunge (right)', 45], ['Low lunge (left)', 45], ['Seated forward fold', 90], ['Reclined butterfly', 90, 'Soles together, knees fall open.'], ['Happy baby', 60], ['Supine twist (right)', 60], ['Supine twist (left)', 60], ['Legs up the wall or bed', 120, 'Heavy legs, slow breath.', 'c'], ['Savasana', 180, 'You did well. Rest.', 'c']], 'h') });
+  add('yoga', 'Desk Reset: Neck, Back and Shoulders', { lvl: 'Beginner', eq: 'Chair or mat', desc: 'Undo hours of sitting in twelve minutes.',
+    steps: seq([['Seated deep breaths', 45, 'Drop your shoulders.', 'w'], ['Neck rolls', 45, 'Slow half circles.'], ['Seated cat-cow', 60], ['Eagle arms', 45, 'Cross and lift the elbows.'], ['Shoulder rolls', 30], ['Seated twist (right)', 40], ['Seated twist (left)', 40], ['Chest opener with clasped hands', 45], ['Forward fold at the chair', 45], ['Puppy pose', 60, 'Melt the chest down.'], ['Child\'s pose', 60, null, 'c'], ['Seated breath', 60, 'Reset and return.', 'c']], 'h') });
+  add('yoga', 'Beginner Yoga', { lvl: 'Beginner', eq: 'Mat', desc: 'A friendly full class. Simple poses, clear cues.',
+    steps: seq([['Easy seat and breath', 60, 'Notice how you feel.', 'w'], ['Cat-cow', 60], ['Child\'s pose', 45], ['Downward dog', 45], ['Low lunge (right)', 45], ['Low lunge (left)', 45], ['Mountain pose', 30], ['Chair pose', 30], ['Warrior II (right)', 40], ['Warrior II (left)', 40], ['Triangle pose (right)', 35], ['Triangle pose (left)', 35], ['Tree pose (right)', 30, 'Eyes on one spot.'], ['Tree pose (left)', 30], ['Cobra pose', 45], ['Bridge pose', 45], ['Happy baby', 45], ['Supine twist (right)', 40, null, 'c'], ['Supine twist (left)', 40, null, 'c'], ['Savasana', 120, 'Rest and soak it in.', 'c']], 'h') });
+  add('yoga', 'Balance and Core Yoga', { lvl: 'Intermediate', eq: 'Mat', desc: 'Strengthen the center and sharpen your focus.',
+    steps: seq([['Mountain pose breath', 45, 'Find your center.', 'w'], ['Cat-cow', 45], ['Plank', 40], ['Side plank (right)', 30], ['Side plank (left)', 30], ['Boat pose', 40], ['Low boat', 30], ['Chair pose', 40], ['Tree pose (right)', 40], ['Tree pose (left)', 40], ['Eagle pose (right)', 30], ['Eagle pose (left)', 30], ['Warrior III (right)', 30, 'Hinge and float.'], ['Warrior III (left)', 30], ['Dancer pose (right)', 30], ['Dancer pose (left)', 30], ['Bridge', 45], ['Supine twist (right)', 40, null, 'c'], ['Supine twist (left)', 40, null, 'c'], ['Savasana', 90, 'Rest.', 'c']], 'h') });
+
+  /* compute ids, minutes, miles */
+  var CATS_ORDER = {};
+  W.forEach(function (w, i) {
+    CATS_ORDER[w.cat] = (CATS_ORDER[w.cat] || 0) + 1;
+    w.id = w.cat + '-' + CATS_ORDER[w.cat];
+    var sec = 0, mi = 0, hasTm = false;
+    w.steps.forEach(function (s) {
+      sec += s.d;
+      if (s.mph != null) { hasTm = true; mi += s.mph * s.d / 3600; }
+    });
+    w.secs = sec;
+    w.mins = Math.round(sec / 60);
+    if (hasTm) w.mi = Math.round(mi * 10) / 10;
+  });
+
+  var CATS = [
+    { id: 'home', name: 'At Home', sub: 'No equipment', icon: 'home' },
+    { id: 'outside', name: 'Walk / Run', sub: 'Outdoor intervals', icon: 'trail' },
+    { id: 'tread', name: 'Treadmill', sub: 'Incline up to 15%', icon: 'ramp' },
+    { id: 'gym', name: 'Gym', sub: 'Upper, lower, full', icon: 'dumbbell' },
+    { id: 'f45', name: 'F45 Style', sub: 'Station circuits', icon: 'bolt' },
+    { id: 'pilates', name: 'Pilates', sub: 'Mat and standing', icon: 'ring' },
+    { id: 'yoga', name: 'Yoga', sub: 'Flow and stretch', icon: 'lotus' },
+    { id: 'custom', name: 'Custom Timer', sub: 'Build your own', icon: 'timer' }
+  ];
+
+  /* ---------- 120 motivational messages ---------- */
+  var QUOTES = [
+    'Show up tired. Leave proud.',
+    'One more round. Future you is already thanking you.',
+    'Strong is built one rep at a time.',
+    'You are not behind. You are just getting started.',
+    'The workout you skip is the only one that cannot help you.',
+    'Sweat now, glow later.',
+    'Small steps still move you forward.',
+    'Your body can do it. Convince your mind.',
+    'Discipline is choosing what you want most over what you want now.',
+    'Ten minutes beats zero minutes.',
+    'You did not come this far to quit here.',
+    'Be proud of every rep, even the messy ones.',
+    'Progress is quiet. Keep showing up anyway.',
+    'Hard today, easier tomorrow.',
+    'You are stronger than the excuse you are holding.',
+    'Move because you love your body, not because you hate it.',
+    'Every mile starts with one step out the door.',
+    'Fall in love with the habit, not the scoreboard.',
+    'Consistency beats intensity when intensity cannot last.',
+    'Today\'s effort is tomorrow\'s energy.',
+    'Breathe. Brace. Go again.',
+    'The only bad workout is the one that did not happen.',
+    'Feel the burn. It is just your muscles saying hello.',
+    'You have survived every hard day so far. Add this one.',
+    'Make it a lifestyle, not a countdown.',
+    'Be the woman who keeps her promises to herself.',
+    'Strength has no age limit.',
+    'Your future self is cheering from the finish line.',
+    'Energy follows action. Start moving.',
+    'You can rest, but you cannot quit.',
+    'Mood low? Move for five minutes, then check again.',
+    'Earn your rest day.',
+    'Every drop of sweat is a vote for who you are becoming.',
+    'Slow is still faster than standing still.',
+    'Fitness is a practice, not a punishment.',
+    'Pause when you need to. Never give up on yourself.',
+    'Your pace is the right pace.',
+    'A strong body starts with a stubborn mind.',
+    'Sore today, stronger tomorrow.',
+    'Lace up. The rest is momentum.',
+    'You are building something nobody can take from you.',
+    'Do it for the energy, the sleep, the confidence and the joy.',
+    'Rain or shine, you still get to move.',
+    'Eyes up. Chest proud. Keep going.',
+    'Strong women are made in ordinary workouts.',
+    'Dream big, train steady.',
+    'This is your hour. Own it.',
+    'Quit comparing. Keep climbing.',
+    'It never gets easier. You just get stronger.',
+    'Treat your body like it is on your team.',
+    'Another day, another chance to surprise yourself.',
+    'The hardest part was starting. You did that.',
+    'Count the wins, not just the reps.',
+    'Let your effort be louder than your doubts.',
+    'Mile by mile, you are writing a new story.',
+    'You are one workout away from a better mood.',
+    'Keep the promise you made this morning.',
+    'Great things grow from tiny daily habits.',
+    'Rise. Move. Repeat.',
+    'You get stronger every time you choose to start.',
+    'Fuel it. Move it. Love it.',
+    'Let the music carry you through the last minute.',
+    'You do not need perfect conditions, just a few minutes.',
+    'Strong hearts take the long road.',
+    'Run your own race.',
+    'Reps today, results soon.',
+    'Your comeback starts with this set.',
+    'Courage is doing the next round with shaky legs.',
+    'The winners are the ones who keep coming back.',
+    'Stand taller. Breathe deeper. Move bolder.',
+    'There is no finish line for becoming the best version of you.',
+    'Be kind to yourself and stay in motion.',
+    'The magic happens just outside your comfort zone.',
+    'Do not count the days. Make the days count.',
+    'Good form first. Strength follows.',
+    'Every step counts, even the slow ones.',
+    'Grit looks good on you.',
+    'You are lapping everyone who stayed on the couch.',
+    'Make your future self proud.',
+    'Trade "I can\'t" for "I\'m learning how."',
+    'Heavy breathing is just your body cheering.',
+    'You were made to move.',
+    'Rest when you are tired. Reset when you are discouraged.',
+    'Your goals are closer than your doubts say.',
+    'Nothing changes if nothing changes. Move.',
+    'A little better than yesterday is plenty.',
+    'Roll the shoulders back. You have got this.',
+    'Make today\'s effort count.',
+    'Sweat is proof you showed up.',
+    'Let the finish be the reward.',
+    'Your energy is a gift. Spend it on movement.',
+    'Strong body, calm mind.',
+    'Push your limits, protect your joints.',
+    'Hydrate, breathe, repeat.',
+    'Do not wait for motivation. Build momentum.',
+    'Today you chose yourself. That is the win.',
+    'Turn "someday" into "today."',
+    'You are allowed to be proud of this.',
+    'The best project you will ever work on is you.',
+    'Grow stronger with every breath.',
+    'Warm up your body. Warm up your courage.',
+    'Run toward the life you want.',
+    'One hour of movement makes the other twenty-three better.',
+    'Be relentless about the basics.',
+    'Healthy is a daily decision.',
+    'Just keep moving. Even a walk is a win.',
+    'You are not tired, you are transforming.',
+    'Climb the hill. The view is yours.',
+    'Give this minute everything you have.',
+    'The last good rep is where the change happens.',
+    'Smile through the hard part.',
+    'If it challenges you, it changes you.',
+    'You are proof that showing up works.',
+    'Keep your head up and your heart rate up.',
+    'Little by little, a little becomes a lot.',
+    'Powered by purpose.',
+    'Move with joy. Finish with pride.',
+    'You have more in you than you think.',
+    'Celebrate every finish, big or small.',
+    'Tomorrow\'s strength is built today.'
+  ];
+
+  var HALF = ['Halfway there. Keep going.', 'You are past the halfway mark. Finish strong.', 'Half done. You are doing great.', 'Halfway. The hard part is behind you.'];
+  var DONE = ['Workout complete. Amazing work.', 'Done. You showed up and it counts.', 'That is a wrap. Be proud of yourself.', 'Finished. Strong work today.'];
+
+  /* ---------- CHALLENGES ---------- */
+  var WK = ['Hit a workout from At Home', 'Walk or run intervals outside', 'Lower body strength at the gym or home', 'Pilates core session', 'Upper body workout', 'F45 style circuit', 'Yoga stretch and recovery'];
+  var WKC = ['home', 'outside', 'gym', 'pilates', 'gym', 'f45', 'yoga'];
+  function dow(d) { return (d - 1) % 7; }
+
+  var CHALLENGES = [
+    { id: 'kick7', name: '7-Day Kickstart', len: '1 week', days: 7, auto: 'workout', desc: 'One workout a day for a week. Any category counts. Build the habit before anything else.',
+      task: function (d) { return { t: WK[dow(d)], cat: WKC[dow(d)] }; } },
+    { id: 'mile7', name: 'Mile a Day: 7 Days', len: '1 week', days: 7, auto: 'mile', min: 1, desc: 'Run or walk at least one mile every day for a week. Log it in the Run tab and the day checks itself off.',
+      task: function (d) { return { t: d === 7 ? 'Victory lap: one mile or more. Go for two if you feel good.' : 'Run or walk one mile or more.', cat: 'run' }; } },
+    { id: 'glow14', name: '14-Day Glow Up', len: '2 weeks', days: 14, auto: 'workout', desc: 'A balanced two-week rotation of strength, cardio, Pilates and yoga.',
+      task: function (d) { return { t: WK[dow(d)], cat: WKC[dow(d)] }; } },
+    { id: 'pilates21', name: '21-Day Pilates and Yoga Reset', len: '3 weeks', days: 21, auto: 'workout', desc: 'Alternate Pilates and yoga for three weeks. Stronger core, calmer mind.',
+      task: function (d) { return d === 21 ? { t: 'Finale: Full-Body Pilates Flow', cat: 'pilates' } : (d % 2 ? { t: 'Pilates session', cat: 'pilates' } : { t: 'Yoga session', cat: 'yoga' }); } },
+    { id: 'move30', name: '30-Day Move Streak', len: '30 days', days: 30, auto: 'workout', desc: 'Move every single day for 30 days. Four weeks, four themes.',
+      task: function (d) {
+        var wk = Math.min(4, Math.ceil(d / 7)), th = ['Build the habit: 20 minutes, any workout', 'Add strength: home or gym', 'Turn up the cardio: F45 style or intervals', 'Push yourself: your hardest workout yet'][wk - 1];
+        return { t: d === 30 ? 'Final day! Pick your favorite workout.' : th, cat: ['home', 'gym', 'f45', 'f45'][wk - 1] };
+      } },
+    { id: 'mile30', name: '30-Day Run a Mile or More', len: '30 days', days: 30, auto: 'mile', min: 1, desc: 'At least one mile every day for 30 days. Run, jog, or walk fast. Log it in the Run tab.',
+      task: function (d) { return { t: d % 7 === 0 ? 'Long day: two miles or more.' : (d === 30 ? 'Victory mile. You did it.' : 'One mile or more.'), cat: 'run' }; } },
+    { id: 'tread30', name: '30-Day Incline Climb', len: '30 days', days: 30, auto: 'workout', desc: 'Raise your incline a little every few days until you hit 15 percent.',
+      task: function (d) {
+        if (d % 7 === 0) return { t: 'Recovery: easy 20-minute walk at 1 percent incline.', cat: 'tread' };
+        var inc = Math.min(MAX_INCLINE, 2 + Math.round((d - 1) * 0.45));
+        return { t: '20 minutes at ' + inc + ' percent incline, 3.0 mph.', cat: 'tread' };
+      } },
+    { id: 'plank30', name: '30-Day Plank Challenge', len: '30 days', days: 30, auto: null, desc: 'Add five seconds to your plank every day. Use the Custom Timer to count it.',
+      task: function (d) { var s = d % 7 === 0 ? 30 : 20 + (d - 1) * 5; return { t: 'Plank for ' + (s >= 60 ? Math.floor(s / 60) + ' min ' + (s % 60 ? (s % 60) + ' sec' : '') : s + ' seconds') + '. Break it into sets if needed.', cat: 'custom' }; } },
+    { id: 'squat30', name: '30-Day Squat Challenge', len: '30 days', days: 30, auto: null, desc: 'Daily squat targets that build up gradually, with a recovery day every fifth day.',
+      task: function (d) { var n = d % 5 === 0 ? 50 : Math.min(200, 50 + (d - 1) * 5); return { t: n + ' squats today. Spread them through the day if you like.', cat: 'home' }; } },
+    { id: 'miles100', name: '100-Mile Month', len: '30 days', days: 30, auto: 'mile', min: 3.3, goal: 100, desc: 'Cover 100 miles in 30 days by running, jogging and walking. About 3.3 miles a day.',
+      task: function (d) { return { t: 'Aim for about 3.3 miles today. Every mile counts toward 100.', cat: 'run' }; } },
+    { id: 'c5k30', name: '5K in 30 Days', len: '30 days', days: 30, auto: 'workout', desc: 'Build from run/walk intervals to a full 5K by day 30. Three run days a week.',
+      task: function (d) {
+        if (d === 30) return { t: 'Race day! Run or run-walk 3.1 miles.', cat: 'run' };
+        var m = d % 7;
+        if (m === 1 || m === 3 || m === 5) { var wk = Math.ceil(d / 7); return { t: 'Run day: ' + ['1 min run, 2 min walk', '90 sec run, 90 sec walk', '2 min run, 1 min walk', '3 min run, 1 min walk'][Math.min(3, wk - 1)] + ', for 25 minutes.', cat: 'outside' }; }
+        if (m === 2 || m === 4) return { t: 'Cross-train: strength at home or the gym.', cat: 'home' };
+        if (m === 6) return { t: 'Easy long walk, 40 minutes.', cat: 'outside' };
+        return { t: 'Rest or yoga stretch.', cat: 'yoga' };
+      } },
+    { id: 'strong60', name: '60-Day Strong', len: '60 days', days: 60, auto: 'workout', desc: 'Two months of structured strength with cardio and recovery built in.',
+      task: function (d) { var m = dow(d); var p = [{ t: 'Gym upper body', cat: 'gym' }, { t: 'Gym lower body', cat: 'gym' }, { t: 'Walk or run intervals', cat: 'outside' }, { t: 'Gym full body', cat: 'gym' }, { t: 'F45 style circuit', cat: 'f45' }, { t: 'Pilates or yoga', cat: 'pilates' }, { t: 'Rest day. Easy walk and stretch.', cat: 'yoga' }]; return p[m]; } }
+  ];
+
+  window.GF = { CATS: CATS, WORKOUTS: W, QUOTES: QUOTES, HALF: HALF, DONE: DONE, CHALLENGES: CHALLENGES, MAX_INCLINE: MAX_INCLINE };
+})();
+</script><script>/* Little Flower Fit app logic */
+(function () {
+  'use strict';
+  var D = window.GF;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var pad = function (n) { return String(n).padStart(2, '0'); };
+  var fmt = function (s) { s = Math.max(0, Math.round(s)); var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60); return h ? h + ':' + pad(m) + ':' + pad(s % 60) : m + ':' + pad(s % 60); };
+  var ymd = function (d) { d = d || new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+  var dayDiff = function (a, b) { return Math.round((Date.parse(b + 'T00:00:00') - Date.parse(a + 'T00:00:00')) / 86400000); };
+  var rnd = function (arr) { return arr[Math.floor(Math.random() * arr.length)]; };
+  var r1 = function (n) { return Math.round(n * 10) / 10; };
+  var r2 = function (n) { return Math.round(n * 100) / 100; };
+
+  /* ---------- icons ---------- */
+  var IC = {
+    home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+    trail: '<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+    ramp: '<path d="M2 19h20"/><path d="M4 19L19 8"/><path d="M19 8v11"/>',
+    dumbbell: '<path d="M6 7v10M3 9.5v5M18 7v10M21 9.5v5M6 12h12"/>',
+    bolt: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+    ring: '<circle cx="12" cy="12" r="8"/><path d="M8 12c1.5 2.5 6.5 2.5 8 0"/>',
+    lotus: '<path d="M12 4c2.5 3 2.5 7 0 11-2.5-4-2.5-8 0-11z"/><path d="M4 9c4 0 7 2 8 6-4 0-7-2-8-6z"/><path d="M20 9c-4 0-7 2-8 6 4 0 7-2 8-6z"/><path d="M6 19h12"/>',
+    timer: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>',
+    run: '<circle cx="14" cy="4.5" r="2"/><path d="M7 21l3-6 3 2 1 4M10 15l-1-5 4-1 2 3h3M6 12l3-2"/>',
+    trophy: '<path d="M8 4h8v6a4 4 0 0 1-8 0z"/><path d="M8 6H4v2a3 3 0 0 0 4 3M16 6h4v2a3 3 0 0 1-4 3M12 14v4M8 21h8M10 18h4"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',
+    play: '<path d="M7 4l13 8-13 8z" fill="currentColor"/>',
+    pause: '<path d="M7 4h4v16H7zM13 4h4v16h-4z" fill="currentColor"/>',
+    prev: '<path d="M19 5L9 12l10 7z" fill="currentColor"/><path d="M6 5v14"/>',
+    next: '<path d="M5 5l10 7-10 7z" fill="currentColor"/><path d="M18 5v14"/>',
+    close: '<path d="M6 6l12 12M18 6L6 18"/>',
+    voice: '<path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/>',
+    bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
+    chev: '<path d="M15 5l-7 7 7 7"/>',
+    flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>'
+  };
+  var ic = function (n) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[n] || '') + '</svg>'; };
+
+  /* ---------- state + persistence ---------- */
+  var KEY = 'glowfit.v1';
+  var defState = function () { return { v: 1, s: { voice: true, beeps: true, flash: true }, log: [], runs: [], ch: {}, upd: 0 }; };
+  var S = defState();
+  function mergeState(o) {
+    if (!o || typeof o !== 'object') return;
+    var d = defState();
+    S = Object.assign({}, d, o, { s: Object.assign({}, d.s, o.s || {}) });
+    if (!Array.isArray(S.log)) S.log = [];
+    if (!Array.isArray(S.runs)) S.runs = [];
+    if (!S.ch || typeof S.ch !== 'object') S.ch = {};
+  }
+  try { var raw = localStorage.getItem(KEY); if (raw) mergeState(JSON.parse(raw)); } catch (e) { /* storage unavailable */ }
+  var cloudRef = null, saveTimer = 0, cloudBusy = false, cloudDirty = false;
+  function save() {
+    S.upd = Date.now();
+    if (S.log.length > 400) S.log = S.log.slice(-400);
+    if (S.runs.length > 300) S.runs = S.runs.slice(-300);
+    try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* ignore */ }
+    cloudDirty = true; clearTimeout(saveTimer); saveTimer = setTimeout(pushCloud, 1500);
+  }
+  function pushCloud() {
+    if (!cloudRef || cloudBusy || !cloudDirty) return;
+    cloudBusy = true; cloudDirty = false;
+    cloudRef.set({ state: S }).then(function () { cloudBusy = false; if (cloudDirty) saveTimer = setTimeout(pushCloud, 1500); }, function () { cloudBusy = false; });
+  }
+  function initCloud() {
+    try {
+      var c = window.claude;
+      if (!c || !c.use) return;
+      Promise.all([c.use('user'), c.use('db')]).then(function (r) {
+        var user = r[0], db = r[1];
+        if (!user || !db) return null;
+        return user.id().then(function (id) {
+          if (!id) return null;
+          cloudRef = db.doc('data/users/' + id + '/glowfit');
+          return cloudRef.get().then(function (snap) {
+            var o = snap.exists ? (snap.data() || {}).state : null;
+            if (o && (o.upd || 0) > (S.upd || 0)) {
+              mergeState(o);
+              try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* ignore */ }
+              render();
+            } else if (S.upd) { cloudDirty = true; pushCloud(); }
+          });
+        });
+      }).catch(function () { /* cloud sync is optional */ });
+    } catch (e) { /* optional */ }
+  }
+
+  /* ---------- audio, voice, wake lock ---------- */
+  var AC = null;
+  function audio() {
+    try {
+      if (!AC) { var C = window.AudioContext || window.webkitAudioContext; if (C) AC = new C(); }
+      if (AC && AC.state === 'suspended') AC.resume();
+    } catch (e) { AC = null; }
+    return AC;
+  }
+  function beep(freq, dur, vol, delay) {
+    if (!S.s.beeps) return;
+    var a = audio(); if (!a) return;
+    try {
+      var t0 = a.currentTime + (delay || 0), o = a.createOscillator(), g = a.createGain();
+      o.type = 'sine'; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(vol || 0.4, t0 + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + (dur || 0.12));
+      o.connect(g); g.connect(a.destination); o.start(t0); o.stop(t0 + (dur || 0.12) + 0.03);
+    } catch (e) { /* ignore */ }
+  }
+  function goBeep() { beep(1046, 0.14, 0.45, 0); beep(1318, 0.4, 0.45, 0.17); }
+  function restBeep() { beep(659, 0.18, 0.4, 0); beep(494, 0.3, 0.4, 0.2); }
+  function chime() { beep(784, 0.2, 0.4, 0); beep(988, 0.2, 0.4, 0.2); beep(1175, 0.2, 0.4, 0.4); beep(1568, 0.6, 0.4, 0.6); }
+  function say(text, o) {
+    o = o || {};
+    if (!S.s.voice || !text || !('speechSynthesis' in window)) return;
+    try {
+      if (o.interrupt) speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = o.rate || 1.05; u.lang = 'en-US';
+      speechSynthesis.speak(u);
+    } catch (e) { /* ignore */ }
+  }
+  function primeVoice() {
+    try { if ('speechSynthesis' in window) { var u = new SpeechSynthesisUtterance('ready'); u.volume = 0; speechSynthesis.speak(u); } } catch (e) { /* ignore */ }
+  }
+  function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* ignore */ } }
+  function flash(id) {
+    if (!S.s.flash) return;
+    var f = $(id); if (!f) return;
+    f.classList.remove('on'); void f.offsetWidth; f.classList.add('on');
+  }
+  var wake = null;
+  function lock() {
+    try {
+      if (navigator.wakeLock && !wake) {
+        navigator.wakeLock.request('screen').then(function (w) { wake = w; w.addEventListener('release', function () { wake = null; }); }, function () { wake = null; });
+      }
+    } catch (e) { wake = null; }
+  }
+  function unlock() { try { if (wake) wake.release(); } catch (e) { /* ignore */ } wake = null; }
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && (P.on || R.on)) { lock(); } });
+
+  var toastT = 0;
+  function toast(msg) {
+    var t = $('#toast'); t.textContent = msg; t.hidden = false;
+    clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, 3200);
+  }
+
+  /* ---------- helpers on data ---------- */
+  var wo = function (id) { return D.WORKOUTS.filter(function (w) { return w.id === id; })[0]; };
+  var catOf = function (id) { return D.CATS.filter(function (c) { return c.id === id; })[0]; };
+  var chDef = function (id) { return D.CHALLENGES.filter(function (c) { return c.id === id; })[0]; };
+  var stepLabel = function (s) { return s.n + (s.mph != null ? ' · ' + s.inc + '% · ' + s.mph.toFixed(1) + ' mph' : ''); };
+  var secText = function (d) { return d >= 60 ? (d % 60 ? Math.floor(d / 60) + ':' + pad(d % 60) : Math.floor(d / 60) + ' min') : d + 's'; };
+
+  function activityDates() { var s = {}; S.log.forEach(function (l) { s[l.d] = 1; }); S.runs.forEach(function (r) { s[r.d] = 1; }); return s; }
+  function streak() {
+    var a = activityDates(), d = new Date(), n = 0;
+    if (!a[ymd(d)]) d.setDate(d.getDate() - 1);
+    while (a[ymd(d)]) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
+  function lastDays(n) { var out = []; for (var i = n - 1; i >= 0; i--) { var d = new Date(); d.setDate(d.getDate() - i); out.push(ymd(d)); } return out; }
+  function minsOn(d) {
+    return S.log.filter(function (l) { return l.d === d; }).reduce(function (a, l) { return a + l.m; }, 0) +
+      S.runs.filter(function (r) { return r.d === d; }).reduce(function (a, r) { return a + Math.round(r.secs / 60); }, 0);
+  }
+  function milesOn(d) { return S.runs.filter(function (r) { return r.d === d; }).reduce(function (a, r) { return a + r.mi; }, 0); }
+  function milesSince(start) { return S.runs.filter(function (r) { return r.d >= start; }).reduce(function (a, r) { return a + r.mi; }, 0); }
+
+  /* ---------- challenges ---------- */
+  function chState(id) {
+    var s = S.ch[id]; if (!s) return null;
+    var def = chDef(id); if (!def) return null;
+    var dn = dayDiff(s.start, ymd()) + 1;
+    return { def: def, s: s, dn: dn, active: dn >= 1 && dn <= def.days, over: dn > def.days };
+  }
+  function markDay(id, n, on) {
+    var s = S.ch[id]; if (!s) return;
+    var i = s.done.indexOf(n);
+    if (on && i < 0) s.done.push(n);
+    if (!on && i >= 0) s.done.splice(i, 1);
+  }
+  function autoCheck(kind) {
+    var names = [], t = ymd();
+    Object.keys(S.ch).forEach(function (id) {
+      var st = chState(id); if (!st || !st.active) return;
+      var def = st.def; if (st.s.done.indexOf(st.dn) >= 0) return;
+      var ok = false;
+      if (kind === 'workout' && def.auto === 'workout') ok = true;
+      if (kind === 'run' && def.auto === 'workout') ok = true;
+      if (kind === 'run' && def.auto === 'mile' && milesOn(t) >= (def.min || 1)) ok = true;
+      if (ok) { markDay(id, st.dn, true); names.push(def.name + ' day ' + st.dn); }
+    });
+    return names;
+  }
+  function chStreak(st) {
+    var n = 0, d = Math.min(st.dn, st.def.days);
+    if (st.s.done.indexOf(d) < 0) d--;
+    while (d >= 1 && st.s.done.indexOf(d) >= 0) { n++; d--; }
+    return n;
+  }
+
+  /* ---------- navigation + views ---------- */
+  var V = { tab: 'train', cat: null, grp: 'All', wid: null, ch: null };
+  var Q = { i: Math.floor(Math.random() * D.QUOTES.length) };
+  var R0 = { mode: 'gps', goal: 1, spd: 5.0, inc: 1 };
+  function go(p) { Object.assign(V, p); render(); window.scrollTo(0, 0); }
+  function tab(t) { go({ tab: t, cat: null, grp: 'All', wid: null, ch: null }); }
+
+  function render() {
+    var el = $('#view'), html = '';
+    if (V.tab === 'train') html = viewTrain();
+    else if (V.tab === 'run') html = viewRun();
+    else if (V.tab === 'chal') html = V.ch ? viewChDetail(V.ch) : viewChal();
+    else html = viewMe();
+    el.innerHTML = html;
+    var nav = [['train', 'Train', 'dumbbell'], ['run', 'Run', 'run'], ['chal', 'Challenges', 'trophy'], ['me', 'Me', 'user']];
+    $('#navin').innerHTML = nav.map(function (n) { return '<button data-a="tab" data-t="' + n[0] + '" class="' + (V.tab === n[0] ? 'on' : '') + '" aria-label="' + n[1] + '">' + ic(n[2]) + n[1] + '</button>'; }).join('');
+    var now = new Date();
+    $('#today').textContent = now.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+  }
+
+  function quoteCard() {
+    var q = D.QUOTES[Q.i];
+    return '<div class="card hero stack"><div class="kicker">Today’s push</div><p class="quote-text">' + esc(q) + '</p>' +
+      '<div class="row wrapf"><button class="btn small" data-a="newq">Another one</button><button class="btn small" data-a="copy" data-t="' + esc(q) + '">Copy</button></div></div>';
+  }
+
+  function activeStrip() {
+    var out = '';
+    Object.keys(S.ch).forEach(function (id) {
+      var st = chState(id); if (!st || !st.active) return;
+      var tk = st.def.task(st.dn), done = st.s.done.indexOf(st.dn) >= 0;
+      out += '<button class="rowbtn" data-a="chopen" data-id="' + id + '"><div class="grow"><div class="kicker">' + esc(st.def.name) + ' · Day ' + st.dn + ' of ' + st.def.days + '</div><b>' + esc(tk.t) + '</b></div><span class="chip ' + (done ? 'on' : '') + '">' + (done ? 'Done' : 'Open') + '</span></button>';
+    });
+    return out ? '<div class="stack"><div class="kicker">Your challenges today</div>' + out + '</div>' : '';
+  }
+
+  function viewTrain() {
+    if (V.wid) return viewWorkout(wo(V.wid));
+    if (V.cat === 'custom') return viewCustom();
+    if (V.cat) return viewCat(V.cat);
+    var tiles = D.CATS.map(function (c) {
+      var n = D.WORKOUTS.filter(function (w) { return w.cat === c.id; }).length;
+      return '<button class="tile" data-a="cat" data-id="' + c.id + '">' + ic(c.icon) + (n ? '<i>' + n + '</i>' : '') + '<b>' + esc(c.name) + '</b><span>' + esc(c.sub) + '</span></button>';
+    }).join('');
+    return '<div class="stack"><h1>Move your body.<br>Your way.</h1>' + quoteCard() + activeStrip() + '<div class="kicker">Pick a workout style</div><div class="grid">' + tiles + '</div></div>';
+  }
+
+  function viewCat(id) {
+    var c = catOf(id), list = D.WORKOUTS.filter(function (w) { return w.cat === id; });
+    var tabs = '';
+    if (id === 'gym') {
+      tabs = '<div class="tabs">' + ['All', 'Upper body', 'Lower body', 'Full body'].map(function (g) { return '<button class="chip ' + (V.grp === g ? 'on' : '') + '" data-a="grp" data-id="' + g + '">' + g + '</button>'; }).join('') + '</div>';
+      if (V.grp !== 'All') list = list.filter(function (w) { return w.grp === V.grp; });
+    }
+    var note = id === 'tread' ? '<div class="warn">Incline is capped at 15% in every workout. The app tells you when to change speed and incline.</div>' : '';
+    var rows = list.map(function (w) {
+      return '<button class="rowbtn" data-a="wo" data-id="' + w.id + '"><div class="grow"><b>' + esc(w.name) + '</b><span class="sub">' + esc(w.lvl) + ' · ' + esc(w.eq) + (w.grp && id === 'gym' ? ' · ' + esc(w.grp) : '') + '</span></div><span class="meta">' + w.mins + ' min</span></button>';
+    }).join('');
+    return '<div class="stack"><button class="back" data-a="back">' + ic('chev') + 'All workouts</button><div><div class="kicker">' + esc(c.sub) + '</div><h1>' + esc(c.name) + '</h1></div>' + tabs + note + rows + '</div>';
+  }
+
+  function overview(w) {
+    var steps = w.steps, out = [];
+    if (steps.length <= 26) {
+      steps.forEach(function (s) { out.push({ t: s.t, l: stepLabel(s), r: secText(s.d) }); });
+    } else {
+      var seen = {}, order = [];
+      steps.forEach(function (s) {
+        if (s.t === 'rest') return;
+        var k = s.t + '|' + stepLabel(s) + '|' + s.d;
+        if (!seen[k]) { seen[k] = { t: s.t, l: stepLabel(s), d: s.d, c: 0 }; order.push(seen[k]); }
+        seen[k].c++;
+      });
+      order.forEach(function (e) { out.push({ t: e.t, l: e.l, r: (e.c > 1 ? e.c + ' × ' : '') + secText(e.d) }); });
+    }
+    return '<ul class="steps">' + out.map(function (e) { return '<li><span class="row" style="align-items:flex-start"><i class="dot ' + e.t + '"></i><span>' + esc(e.l) + '</span></span><span>' + esc(e.r) + '</span></li>'; }).join('') + '</ul>';
+  }
+
+  function viewWorkout(w) {
+    var c = catOf(w.cat);
+    var chips = '<span class="chip on">' + w.mins + ' min</span><span class="chip">' + esc(w.lvl) + '</span><span class="chip">' + esc(w.eq) + '</span>' + (w.mi != null ? '<span class="chip">≈ ' + w.mi + ' mi</span>' : '');
+    var work = w.steps.filter(function (s) { return s.t === 'work' || s.t === 'hold'; }).length;
+    var inside = w.steps.length > 26 ? 'Exercises (rests are timed for you)' : 'Step by step';
+    return '<div class="stack"><button class="back" data-a="back">' + ic('chev') + esc(c.name) + '</button><div><div class="kicker">' + esc(c.name) + (w.grp ? ' · ' + esc(w.grp) : '') + '</div><h1>' + esc(w.name) + '</h1></div>' +
+      '<div class="row wrapf">' + chips + '</div><p class="muted">' + esc(w.desc) + '</p>' +
+      '<button class="btn primary block" data-a="start" data-id="' + w.id + '">Start workout</button>' +
+      (w.cat === 'tread' ? '<div class="warn">Incline never goes above 15%. Change the machine when the app announces a new incline and speed. A 10 second get-ready countdown comes first.</div>' : '<div class="note">A 10 second get-ready countdown starts first. You will hear a beep and voice countdown at 5 seconds before every change.</div>') +
+      '<div class="card"><div class="kicker" style="margin-bottom:6px">' + inside + ' · ' + work + ' work blocks</div>' + overview(w) + '</div></div>';
+  }
+
+  function viewCustom() {
+    var presets = [['Tabata', 20, 10, 8], ['40 / 20', 40, 20, 10], ['45 / 15', 45, 15, 8], ['30 / 30', 30, 30, 12], ['60 / 30', 60, 30, 6]];
+    return '<div class="stack"><button class="back" data-a="back">' + ic('chev') + 'All workouts</button><div><div class="kicker">Build your own</div><h1>Custom Timer</h1></div>' +
+      '<p class="muted">Set work and rest times. You get the same beeps, voice and 5 second countdown.</p>' +
+      '<div class="tabs">' + presets.map(function (p) { return '<button class="chip" data-a="preset" data-w="' + p[1] + '" data-r="' + p[2] + '" data-n="' + p[3] + '">' + p[0] + '</button>'; }).join('') + '</div>' +
+      '<div class="form">' +
+      '<div class="field"><label for="cWork">Work (sec)</label><input id="cWork" type="number" inputmode="numeric" min="5" max="3600" value="40"></div>' +
+      '<div class="field"><label for="cRest">Rest (sec)</label><input id="cRest" type="number" inputmode="numeric" min="0" max="600" value="20"></div>' +
+      '<div class="field"><label for="cRounds">Rounds</label><input id="cRounds" type="number" inputmode="numeric" min="1" max="99" value="8"></div>' +
+      '<div class="field"><label for="cWarm">Warm-up (sec)</label><input id="cWarm" type="number" inputmode="numeric" min="0" max="600" value="60"></div></div>' +
+      '<button class="btn primary block" data-a="cstart">Start timer</button></div>';
+  }
+
+  /* ---------- run view ---------- */
+  function viewRun() {
+    var wk = lastDays(7), wkMi = wk.reduce(function (a, d) { return a + milesOn(d); }, 0);
+    var total = S.runs.reduce(function (a, r) { return a + r.mi; }, 0);
+    var best = null;
+    S.runs.forEach(function (r) { if (r.mi >= 1 && r.secs > 0) { var p = r.secs / r.mi; if (best === null || p < best) best = p; } });
+    var goals = [[1, '1 mile'], [2, '2 miles'], [3.1, '5K'], [5, '5 miles'], [0, 'Open']];
+    var recent = S.runs.slice(-6).reverse().map(function (r) {
+      return '<div class="rowbtn" style="cursor:default"><div class="grow"><b>' + r2(r.mi) + ' mi · ' + fmt(r.secs) + '</b><span class="sub">' + esc(r.d) + ' · ' + (r.mi > 0 ? fmt(r.secs / r.mi) + ' /mi' : '') + ' · ' + esc(r.mode) + '</span></div></div>';
+    }).join('');
+    return '<div class="stack"><div><div class="kicker">Walk, jog or run</div><h1>Run a mile<br>or more</h1></div>' +
+      '<div class="tabs"><button class="chip ' + (R0.mode === 'gps' ? 'on' : '') + '" data-a="rmode" data-id="gps">Outdoor (GPS)</button><button class="chip ' + (R0.mode === 'tread' ? 'on' : '') + '" data-a="rmode" data-id="tread">Treadmill</button></div>' +
+      '<div><div class="kicker" style="margin-bottom:6px">Goal</div><div class="tabs">' + goals.map(function (g) { return '<button class="chip ' + (R0.goal === g[0] ? 'on' : '') + '" data-a="rgoal" data-v="' + g[0] + '">' + g[1] + '</button>'; }).join('') + '</div></div>' +
+      (R0.mode === 'tread' ? '<div class="form"><div class="field"><label for="rSpdIn">Start speed (mph)</label><input id="rSpdIn" type="number" inputmode="decimal" step="0.1" min="1" max="12" value="' + R0.spd + '"></div><div class="field"><label for="rIncIn">Incline (max 15%)</label><input id="rIncIn" type="number" inputmode="decimal" step="0.5" min="0" max="15" value="' + R0.inc + '"></div></div><p class="note">Distance is calculated from your speed and time. Change speed during the run and tap the same change in the app.</p>' : '<p class="note">GPS tracks distance and announces each mile with your pace. If GPS is blocked on your phone, the timer still runs and you can type your miles when you finish.</p>') +
+      '<button class="btn primary block" data-a="startrun">Start</button>' +
+      '<div class="card"><div class="stats"><div class="stat"><b>' + r1(wkMi) + '</b><span>Miles, last 7 days</span></div><div class="stat"><b>' + r1(total) + '</b><span>Total miles</span></div><div class="stat"><b>' + (best ? fmt(best) : '-') + '</b><span>Best mile pace</span></div><div class="stat"><b>' + S.runs.length + '</b><span>Runs logged</span></div></div></div>' +
+      '<div class="card stack"><div class="kicker">Log a run you already did</div><div class="form"><div class="field"><label for="mlMi">Miles</label><input id="mlMi" type="number" inputmode="decimal" step="0.01" min="0" placeholder="1.00"></div><div class="field"><label for="mlMin">Minutes</label><input id="mlMin" type="number" inputmode="decimal" step="0.1" min="0" placeholder="12"></div></div><button class="btn block" data-a="logrun">Save run</button></div>' +
+      (recent ? '<div class="kicker">Recent</div>' + recent : '') + '</div>';
+  }
+
+  /* ---------- challenges views ---------- */
+  function viewChal() {
+    var act = '', browse = '';
+    D.CHALLENGES.forEach(function (c) {
+      var st = chState(c.id);
+      if (st) {
+        var pct = Math.round(100 * st.s.done.length / c.days);
+        act += '<button class="rowbtn" data-a="chopen" data-id="' + c.id + '"><div class="grow stack" style="gap:8px"><div><div class="kicker">' + (st.over ? 'Finished' : 'Day ' + st.dn + ' of ' + c.days) + '</div><b>' + esc(c.name) + '</b></div><div class="bar"><i style="width:' + pct + '%"></i></div></div><span class="meta">' + st.s.done.length + '/' + c.days + '</span></button>';
+      } else {
+        browse += '<div class="card stack"><div class="row between"><b>' + esc(c.name) + '</b><span class="chip">' + esc(c.len) + '</span></div><p class="muted">' + esc(c.desc) + '</p><button class="btn small primary" data-a="chstart" data-id="' + c.id + '" style="align-self:flex-start">Start challenge</button></div>';
+      }
+    });
+    return '<div class="stack"><div><div class="kicker">One week, one month, one big goal</div><h1>Challenges</h1></div>' + (act ? '<div class="kicker">Active</div>' + act : '') + '<div class="kicker">' + (act ? 'Add another' : 'Pick a challenge') + '</div>' + browse + '</div>';
+  }
+
+  function viewChDetail(id) {
+    var st = chState(id), c = chDef(id);
+    if (!st) { return '<div class="stack"><button class="back" data-a="chback">' + ic('chev') + 'Challenges</button><p>Challenge not started.</p></div>'; }
+    var n = st.s.done.length, pct = Math.round(100 * n / c.days);
+    var today = '';
+    if (st.active) {
+      var tk = c.task(st.dn), done = st.s.done.indexOf(st.dn) >= 0;
+      today = '<div class="card hero stack"><div class="kicker">Day ' + st.dn + ' of ' + c.days + '</div><p class="quote-text">' + esc(tk.t) + '</p><div class="row wrapf"><button class="btn small" data-a="chgo" data-cat="' + tk.cat + '">' + (tk.cat === 'run' ? 'Open Run tab' : 'Find a workout') + '</button><button class="btn small" data-a="tday" data-id="' + id + '" data-n="' + st.dn + '">' + (done ? 'Done. Tap to undo' : 'Mark done') + '</button></div></div>';
+    } else if (st.over) {
+      today = '<div class="card hero stack"><div class="kicker">Challenge finished</div><p class="quote-text">You completed ' + n + ' of ' + c.days + ' days. That is something to be proud of.</p></div>';
+    }
+    var cells = '';
+    for (var d = 1; d <= c.days; d++) {
+      var cls = st.s.done.indexOf(d) >= 0 ? 'done' : (d === st.dn ? 'today' : (d < st.dn ? 'miss' : 'future'));
+      cells += '<button class="day ' + cls + '" data-a="tday" data-id="' + id + '" data-n="' + d + '" ' + (d > st.dn ? 'disabled' : '') + ' aria-label="Day ' + d + '">' + d + '</button>';
+    }
+    var miles = '';
+    if (c.goal) { var mi = milesSince(st.s.start); miles = '<div class="card stack"><div class="row between"><b>' + r1(mi) + ' of ' + c.goal + ' miles</b><span class="muted">' + r1(Math.max(0, c.goal - mi)) + ' to go</span></div><div class="bar"><i style="width:' + Math.min(100, Math.round(100 * mi / c.goal)) + '%"></i></div></div>'; }
+    return '<div class="stack"><button class="back" data-a="chback">' + ic('chev') + 'Challenges</button><div><div class="kicker">' + esc(c.len) + '</div><h1>' + esc(c.name) + '</h1></div><p class="muted">' + esc(c.desc) + '</p>' + today + miles +
+      '<div class="card stack"><div class="row between"><b>' + n + ' of ' + c.days + ' days</b><span class="muted">Streak ' + chStreak(st) + '</span></div><div class="bar"><i style="width:' + pct + '%"></i></div><div class="cal">' + cells + '</div><p class="note">Tap a past day to check it off or undo it.</p></div>' +
+      '<button class="btn ghost block" data-a="chquit" data-id="' + id + '" data-confirm="Tap again to quit">Quit this challenge</button></div>';
+  }
+
+  /* ---------- me view ---------- */
+  function sw(key, label, sub) {
+    return '<button class="switch" data-a="set" data-k="' + key + '"><span><b>' + label + '</b><br><span class="note">' + sub + '</span></span><span class="tog ' + (S.s[key] ? 'on' : '') + '"></span></button>';
+  }
+  function viewMe() {
+    var days = lastDays(7), mins = days.map(minsOn), mx = Math.max.apply(null, mins.concat([1]));
+    var wkW = S.log.filter(function (l) { return days.indexOf(l.d) >= 0; }).length;
+    var hist = S.log.map(function (l) { return { ts: l.ts, a: l.n, b: l.m + ' min', c: l.d }; }).concat(S.runs.map(function (r) { return { ts: r.ts, a: 'Run · ' + r2(r.mi) + ' mi', b: fmt(r.secs), c: r.d }; }))
+      .sort(function (x, y) { return y.ts - x.ts; }).slice(0, 10)
+      .map(function (h) { return '<div class="rowbtn" style="cursor:default"><div class="grow"><b>' + esc(h.a) + '</b><span class="sub">' + esc(h.c) + '</span></div><span class="meta" style="font-size:20px">' + esc(h.b) + '</span></div>'; }).join('');
+    var wkdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    var bars = days.map(function (d, i) { var dt = new Date(d + 'T00:00:00'); return '<div class="' + (mins[i] ? '' : 'empty') + '"><i style="height:' + Math.max(4, Math.round(80 * mins[i] / mx)) + 'px"></i>' + wkdays[dt.getDay()] + '</div>'; }).join('');
+    return '<div class="stack"><div><div class="kicker">Your progress</div><h1>Me</h1></div>' +
+      '<div class="card"><div class="stats"><div class="stat"><b>' + streak() + '</b><span>Day streak</span></div><div class="stat"><b>' + wkW + '</b><span>Workouts, 7 days</span></div><div class="stat"><b>' + mins.reduce(function (a, b) { return a + b; }, 0) + '</b><span>Minutes, 7 days</span></div><div class="stat"><b>' + r1(days.reduce(function (a, d) { return a + milesOn(d); }, 0)) + '</b><span>Miles, 7 days</span></div></div></div>' +
+      '<div class="card stack"><div class="kicker">Minutes per day</div><div class="week">' + bars + '</div></div>' +
+      (hist ? '<div class="kicker">Recent activity</div>' + hist : '<div class="card muted">Finish a workout and it shows up here.</div>') +
+      '<div class="card stack"><div class="kicker">Cues</div>' + sw('voice', 'Voice coach', 'Speaks changes and the 5 second countdown') + sw('beeps', 'Beeps', 'Tones at 5, 4, 3, 2, 1 and at every change') + sw('flash', 'Screen flash', 'The screen flashes at each change') +
+      '<button class="btn block" data-a="testsound">Test sound and voice</button><p class="note">On iPhone, keep the screen on while you train and turn the silent switch off. The app asks your phone to stay awake during a workout.</p></div>' +
+      '<button class="btn ghost block" data-a="reset" data-confirm="Tap again to erase everything">Erase my data</button></div>';
+  }
+
+  /* ---------- workout player ---------- */
+  var P = { on: false, w: null, steps: [], i: 0, remain: 0, endAt: 0, paused: false, total: 0, timer: 0, cued: {}, half: false, finished: false, quote: '' };
+  var PHASE = { ready: 'warm', work: 'work', rest: 'rest', warm: 'warm', cool: 'cool', hold: 'hold' };
+  var PLABEL = { ready: 'Get ready', work: 'Work', rest: 'Rest', warm: 'Warm-up', cool: 'Cool-down', hold: 'Hold' };
+  var CIRC = 2 * Math.PI * 88;
+
+  function playerHTML() {
+    return '<div class="flash" id="pFlash"></div><div class="col" style="overflow-y:auto">' +
+      '<div class="ptop"><button class="icon" data-a="pEnd" aria-label="End workout">' + ic('close') + '</button><div class="phase" id="pPhase"></div><div class="row"><button class="icon" id="pVoice" data-a="tvoice" aria-label="Voice on or off">' + ic('voice') + '</button><button class="icon" id="pBeep" data-a="tbeep" aria-label="Beeps on or off">' + ic('bell') + '</button></div></div>' +
+      '<div class="pname" id="pName"></div>' +
+      '<div class="ringwrap"><svg viewBox="0 0 200 200"><circle class="bg" cx="100" cy="100" r="88" fill="none" stroke-width="12"/><circle class="fg" id="pRing" cx="100" cy="100" r="88" fill="none" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + CIRC.toFixed(2) + '" stroke-dashoffset="0"/></svg><div class="mid"><div class="time" id="pTime">0:10</div><div class="note" id="pStep"></div></div></div>' +
+      '<div class="badges" id="pBadges" hidden></div><div class="ptip" id="pTip"></div><div class="pnext" id="pNext"></div>' +
+      '<div class="bar"><i id="pBar"></i></div><div class="pfoot"><span id="pElapsed"></span><span id="pLeft"></span></div>' +
+      '<div class="ctrls"><button class="icon" data-a="pPrev" aria-label="Previous">' + ic('prev') + '</button><button class="icon big" id="pPlay" data-a="pPlay" aria-label="Pause or resume">' + ic('pause') + '</button><button class="icon" data-a="pNext" aria-label="Skip">' + ic('next') + '</button></div></div>' +
+      '<div class="sheet" id="pSheet" hidden><div><h2>End workout?</h2><p class="muted" id="pSheetTxt"></p><button class="btn primary" data-a="pKeep">Keep going</button><button class="btn" data-a="pSave" id="pSaveBtn">Save and end</button><button class="btn ghost" data-a="pDiscard">End without saving</button></div></div>';
+  }
+
+  function elapsedSec() {
+    var e = 0;
+    for (var k = 1; k < P.i; k++) e += P.steps[k].d;
+    if (P.i >= 1) e += P.steps[P.i].d - P.remain / 1000;
+    return Math.max(0, e);
+  }
+  function sayOf(s) {
+    if (s.say) return s.say;
+    var base = s.t === 'warm' ? 'Warm up' : s.t === 'cool' ? 'Cool down' : s.n;
+    var long = s.tip && s.d >= 40 && (s.t === 'work' || s.t === 'hold' || s.t === 'warm' || s.t === 'cool');
+    return base + (long ? '. ' + s.tip : '');
+  }
+  function nxSay(s) { return s ? (s.say || s.n) : ''; }
+
+  function startPlayer(w) {
+    audio(); primeVoice();
+    P.w = w; P.on = true; P.finished = false; P.paused = false; P.half = false;
+    P.steps = [{ t: 'ready', n: 'Get ready', d: 10 }].concat(w.steps);
+    P.total = w.steps.reduce(function (a, s) { return a + s.d; }, 0);
+    var ov = $('#player'); ov.innerHTML = playerHTML(); ov.hidden = false;
+    document.body.style.overflow = 'hidden';
+    lock(); syncToggles();
+    enter(0);
+    clearInterval(P.timer); P.timer = setInterval(tick, 100);
+  }
+
+  function syncToggles() {
+    var v = $('#pVoice'), b = $('#pBeep');
+    if (v) v.classList.toggle('off', !S.s.voice);
+    if (b) b.classList.toggle('off', !S.s.beeps);
+  }
+
+  function enter(i, over) {
+    over = over || 0;
+    while (i + 1 < P.steps.length && over >= P.steps[i].d * 1000) { over -= P.steps[i].d * 1000; i++; }
+    var st = P.steps[i], nx = P.steps[i + 1];
+    P.i = i; P.remain = Math.max(0, st.d * 1000 - over); P.endAt = Date.now() + P.remain; P.cued = {};
+    var ov = $('#player');
+    ov.style.setProperty('--phase', 'var(--c-' + PHASE[st.t] + ')');
+    $('#pPhase').textContent = PLABEL[st.t];
+    $('#pName').textContent = st.t === 'ready' ? 'Get ready' : st.n;
+    $('#pStep').textContent = st.r || '';
+    var restLike = st.t === 'rest' || st.t === 'ready';
+    if (restLike && !st.tip) { P.quote = rnd(D.QUOTES); }
+    $('#pTip').textContent = st.tip || (restLike ? P.quote : '');
+    var nxt = nx, then = '';
+    if (nx && nx.t === 'rest' && P.steps[i + 2]) { then = ' (after rest)'; nxt = P.steps[i + 2]; }
+    $('#pNext').innerHTML = nxt ? '<span>' + (st.t === 'ready' ? 'First up:' : 'Next:') + '</span> ' + esc(stepLabel(st.t === 'ready' ? P.steps[1] : nxt)) + '<span>' + then + '</span>' : '<span>Last one. Finish strong.</span>';
+    var bd = $('#pBadges');
+    if (st.mph != null) { bd.hidden = false; bd.innerHTML = '<div class="badge"><b>' + st.inc + '%</b><span>Incline</span></div><div class="badge"><b>' + st.mph.toFixed(1) + '</b><span>Speed mph</span></div>'; } else { bd.hidden = true; bd.innerHTML = ''; }
+    var msg = '';
+    if (st.t === 'ready') msg = 'Get ready. First up: ' + nxSay(P.steps[1]) + '.';
+    else if (st.t === 'rest') msg = (st.d <= 12 ? 'Switch. ' : 'Rest. ') + (nx ? 'Next up: ' + nxSay(nx) + '.' : '');
+    else msg = sayOf(st);
+    if (!P.half && P.total > 0 && elapsedSec() / P.total >= 0.5 && (st.t === 'work' || st.t === 'hold')) { P.half = true; msg = rnd(D.HALF) + ' ' + msg; }
+    if (i > 0) { if (st.t === 'rest') restBeep(); else goBeep(); flash('#pFlash'); buzz(st.t === 'rest' ? 120 : 220); }
+    say(msg, { interrupt: true });
+    paint();
+  }
+
+  function paint() {
+    var st = P.steps[P.i]; if (!st) return;
+    var sec = Math.ceil(P.remain / 1000);
+    $('#pTime').textContent = fmt(sec);
+    $('#pRing').setAttribute('stroke-dashoffset', (CIRC * (1 - P.remain / (st.d * 1000))).toFixed(2));
+    var el = elapsedSec();
+    $('#pBar').style.width = (P.total ? Math.min(100, 100 * el / P.total) : 0).toFixed(1) + '%';
+    $('#pElapsed').textContent = fmt(el) + ' done';
+    $('#pLeft').textContent = fmt(Math.max(0, P.total - el)) + ' left';
+  }
+
+  var CUEF = [0, 820, 780, 740, 700, 660];
+  function tick() {
+    if (!P.on || P.paused || P.finished) return;
+    var st = P.steps[P.i];
+    P.remain = Math.max(0, P.endAt - Date.now());
+    var sl = Math.ceil(P.remain / 1000);
+    if (sl >= 1 && sl <= 5 && sl < st.d && !P.cued[sl]) { P.cued[sl] = 1; beep(CUEF[sl], 0.11, 0.4); say(String(sl), { rate: 1.25 }); buzz(30); }
+    else if (sl === 10 && st.d >= 20 && !P.cued[10]) { P.cued[10] = 1; say('10 seconds', { rate: 1.1 }); }
+    else if (sl === 30 && st.d >= 75 && !P.cued[30]) { P.cued[30] = 1; say('30 seconds', { rate: 1.1 }); }
+    paint();
+    if (P.remain <= 0) next(Date.now() - P.endAt);
+  }
+  function next(over) { if (P.i + 1 < P.steps.length) enter(P.i + 1, over || 0); else finish(); }
+  function prev() {
+    var st = P.steps[P.i];
+    if (st.d * 1000 - P.remain > 3000 || P.i <= 1) enter(Math.max(P.i <= 0 ? 0 : 1, P.i)); else enter(P.i - 1);
+  }
+  function togglePause() {
+    var b = $('#pPlay'); if (!b) return;
+    if (!P.paused) { P.remain = Math.max(0, P.endAt - Date.now()); P.paused = true; try { speechSynthesis.cancel(); } catch (e) { /* ignore */ } b.innerHTML = ic('play'); $('#pPhase').textContent = 'Paused'; }
+    else { P.endAt = Date.now() + P.remain; P.paused = false; b.innerHTML = ic('pause'); $('#pPhase').textContent = PLABEL[P.steps[P.i].t]; audio(); }
+  }
+
+  function logWorkout(w, mins, auto) {
+    S.log.push({ ts: Date.now(), d: ymd(), n: w.name, cat: w.cat, m: mins });
+    var names = auto ? autoCheck('workout') : [];
+    save();
+    return names;
+  }
+
+  function finish() {
+    P.finished = true; P.on = false; clearInterval(P.timer); if (!R.on) unlock();
+    var mins = Math.max(1, Math.round(P.total / 60));
+    var names = logWorkout(P.w, mins, true);
+    chime(); buzz(400); say(rnd(D.DONE) + ' ' + rnd(D.QUOTES), { interrupt: true });
+    $('#player').style.setProperty('--phase', 'var(--c-work)');
+    $('#player').innerHTML = '<div class="col"><div class="done-wrap"><div class="big">Done!</div><div><b style="font-size:20px">' + esc(P.w.name) + '</b><div class="muted">' + mins + ' minutes · saved to your log</div></div>' +
+      '<div class="card hero"><p class="quote-text">' + esc(rnd(D.QUOTES)) + '</p></div>' + (names.length ? '<div class="warn">Checked off: ' + esc(names.join(', ')) + '</div>' : '') +
+      '<button class="btn primary block" data-a="pClose">Close</button></div></div>';
+  }
+
+  function closePlayer() {
+    clearInterval(P.timer); P.on = false;
+    try { speechSynthesis.cancel(); } catch (e) { /* ignore */ }
+    $('#player').hidden = true; $('#player').innerHTML = '';
+    if (!R.on) { unlock(); document.body.style.overflow = ''; }
+    render();
+  }
+  function askEnd() {
+    if (!P.on || P.finished) return;
+    if (!P.paused) togglePause();
+    var mins = Math.round(elapsedSec() / 60);
+    $('#pSheetTxt').textContent = mins >= 2 ? 'You have done ' + mins + ' minutes. Save it to your log?' : 'You are just getting started. Keep going, or end now.';
+    $('#pSaveBtn').hidden = mins < 2;
+    $('#pSheet').hidden = false;
+  }
+  function endSave() {
+    var mins = Math.max(1, Math.round(elapsedSec() / 60));
+    var names = logWorkout(P.w, mins, mins >= 10);
+    toast(names.length ? 'Saved. Checked off: ' + names.join(', ') : 'Saved ' + mins + ' minutes');
+    closePlayer();
+  }
+
+  /* ---------- run tracker ---------- */
+  var R = { on: false, mode: 'gps', goal: 1, paused: false, accum: 0, seg: 0, lastT: 0, dist: 0, mph: 5, inc: 1, watch: null, last: null, fix: 'wait', nextMile: 1, goalHit: false, timer: 0 };
+  var FIXTXT = {
+    wait: 'Looking for GPS signal…', ok: 'GPS locked. Tracking your distance.', weak: 'GPS signal is weak. Distance may lag.',
+    none: 'GPS is not available here, so distance will not track. The timer still runs. Enter your miles when you finish, or use Treadmill mode.',
+    tread: 'Treadmill mode. Distance comes from your speed and time.'
+  };
+
+  function runHTML() {
+    return '<div class="flash" id="rFlash"></div><div class="col" style="overflow-y:auto">' +
+      '<div class="ptop"><button class="icon" data-a="rEnd" aria-label="Finish run">' + ic('close') + '</button><div class="phase" id="rPhase">' + (R.mode === 'tread' ? 'Treadmill run' : 'Outdoor run') + '</div><div class="row"><button class="icon" id="rVoice" data-a="tvoice" aria-label="Voice on or off">' + ic('voice') + '</button></div></div>' +
+      '<div class="ringwrap"><svg viewBox="0 0 200 200"><circle class="bg" cx="100" cy="100" r="88" fill="none" stroke-width="12"/><circle class="fg" id="rRing" cx="100" cy="100" r="88" fill="none" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + CIRC.toFixed(2) + '" stroke-dashoffset="' + CIRC.toFixed(2) + '"/></svg><div class="mid"><div class="time" style="font-size:clamp(54px,17vw,88px)" id="rTime">0:00</div><div class="note" id="rGoal"></div></div></div>' +
+      '<div class="badges"><div class="badge"><b id="rDist">0.00</b><span>Miles</span></div><div class="badge"><b id="rPace">-</b><span>Avg pace /mi</span></div></div>' +
+      '<div class="badges" id="rTm" hidden><div class="badge"><div class="row between"><button class="icon" style="width:40px;height:40px" data-a="spd" data-v="-0.1" aria-label="Slower">−</button><b id="rSpd">5.0</b><button class="icon" style="width:40px;height:40px" data-a="spd" data-v="0.1" aria-label="Faster">+</button></div><span>Speed mph</span></div><div class="badge"><div class="row between"><button class="icon" style="width:40px;height:40px" data-a="inc" data-v="-0.5" aria-label="Lower incline">−</button><b id="rInc">1.0</b><button class="icon" style="width:40px;height:40px" data-a="inc" data-v="0.5" aria-label="Raise incline">+</button></div><span>Incline % (max 15)</span></div></div>' +
+      '<div class="ptip" id="rNote"></div><div class="bar"><i id="rBar"></i></div>' +
+      '<div class="ctrls"><button class="icon big" id="rPlay" data-a="rPause" aria-label="Pause or resume">' + ic('pause') + '</button><button class="btn" data-a="rEnd">Finish</button></div></div>' +
+      '<div class="sheet" id="rSheet" hidden><div><h2>Save your run</h2><p class="muted" id="rSheetTxt"></p><div class="field"><label for="rMi">Miles</label><input id="rMi" type="number" inputmode="decimal" step="0.01" min="0"></div><button class="btn primary" data-a="rSave">Save run</button><button class="btn" data-a="rKeep">Keep going</button><button class="btn ghost" data-a="rDiscard">Discard</button></div></div>';
+  }
+
+  function runElapsed() { return R.accum + (R.paused ? 0 : Date.now() - R.seg); }
+
+  function startRun() {
+    if (R.on) return;
+    audio(); primeVoice();
+    R.on = true; R.mode = R0.mode; R.goal = R0.goal; R.paused = false; R.accum = 0; R.seg = Date.now(); R.lastT = Date.now();
+    R.dist = 0; R.nextMile = 1; R.goalHit = false; R.last = null; R.fix = R.mode === 'tread' ? 'tread' : 'wait';
+    var sp = parseFloat(($('#rSpdIn') || {}).value), ic2 = parseFloat(($('#rIncIn') || {}).value);
+    R.mph = isFinite(sp) && sp > 0 ? Math.min(12, sp) : R0.spd; R.inc = isFinite(ic2) ? Math.min(D.MAX_INCLINE, Math.max(0, ic2)) : R0.inc;
+    R0.spd = R.mph; R0.inc = R.inc;
+    var ov = $('#runner'); ov.innerHTML = runHTML(); ov.hidden = false; document.body.style.overflow = 'hidden';
+    $('#rVoice').classList.toggle('off', !S.s.voice);
+    $('#rTm').hidden = R.mode !== 'tread';
+    $('#runner').style.setProperty('--phase', 'var(--c-work)');
+    lock();
+    if (R.mode === 'gps') startGPS();
+    goBeep(); flash('#rFlash');
+    say('Run started.' + (R.goal ? ' Goal: ' + (R.goal === 3.1 ? 'a 5K' : R.goal + (R.goal === 1 ? ' mile' : ' miles')) + '.' : ' Go at your own pace.'), { interrupt: true });
+    clearInterval(R.timer); R.timer = setInterval(runTick, 500);
+    runTick();
+  }
+
+  function startGPS() {
+    if (!('geolocation' in navigator)) { R.fix = 'none'; return; }
+    try { R.watch = navigator.geolocation.watchPosition(onPos, onPosErr, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 }); }
+    catch (e) { R.fix = 'none'; }
+  }
+  function stopGPS() { try { if (R.watch != null) navigator.geolocation.clearWatch(R.watch); } catch (e) { /* ignore */ } R.watch = null; }
+  function onPosErr(err) { R.fix = err && (err.code === 1 || err.code === 2) ? 'none' : 'weak'; }
+  function hav(a, b) {
+    var t = Math.PI / 180, dLa = (b.lat - a.lat) * t, dLo = (b.lon - a.lon) * t;
+    var x = Math.sin(dLa / 2) * Math.sin(dLa / 2) + Math.cos(a.lat * t) * Math.cos(b.lat * t) * Math.sin(dLo / 2) * Math.sin(dLo / 2);
+    return 6371000 * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+  }
+  function onPos(pos) {
+    if (!R.on || R.paused) return;
+    var c = pos.coords;
+    if (c.accuracy > 35) { R.fix = 'weak'; return; }
+    R.fix = 'ok';
+    var p = { lat: c.latitude, lon: c.longitude, ts: pos.timestamp };
+    if (R.last) {
+      var d = hav(R.last, p), dt = (p.ts - R.last.ts) / 1000;
+      if (d >= 4 && dt > 0 && d / dt < 12) { R.dist += d / 1609.344; R.last = p; }
+      else if (d >= 4 && dt > 0) { R.last = p; }
+    } else { R.last = p; }
+  }
+
+  function spoken(sec) { sec = Math.round(sec); var m = Math.floor(sec / 60), s = sec % 60; return m + (m === 1 ? ' minute ' : ' minutes ') + s + (s === 1 ? ' second' : ' seconds'); }
+  function runTick() {
+    if (!R.on) return;
+    var now = Date.now();
+    if (R.mode === 'tread' && !R.paused) R.dist += R.mph * (now - R.lastT) / 3600000;
+    R.lastT = now;
+    while (R.dist >= R.nextMile) {
+      var t = runElapsed() / 1000;
+      goBeep(); flash('#rFlash'); buzz(250);
+      say('Mile ' + R.nextMile + '. Time ' + spoken(t) + '. Average pace ' + spoken(t / R.nextMile) + ' per mile.', { interrupt: true });
+      R.nextMile++;
+    }
+    if (R.goal > 0 && !R.goalHit && R.dist >= R.goal) { R.goalHit = true; chime(); flash('#rFlash'); say('Goal reached. Amazing work. Keep going or finish when you are ready.'); }
+    paintRun();
+  }
+  function paintRun() {
+    var t = runElapsed() / 1000;
+    $('#rTime').textContent = fmt(t);
+    $('#rDist').textContent = R.dist.toFixed(2);
+    $('#rPace').textContent = R.dist >= 0.05 ? fmt(t / R.dist) : '-';
+    var frac = R.goal > 0 ? Math.min(1, R.dist / R.goal) : (R.dist - Math.floor(R.dist));
+    $('#rRing').setAttribute('stroke-dashoffset', (CIRC * (1 - frac)).toFixed(2));
+    $('#rBar').style.width = (frac * 100).toFixed(1) + '%';
+    $('#rGoal').textContent = R.goal > 0 ? 'Goal ' + (R.goal === 3.1 ? '5K (3.1 mi)' : R.goal + ' mi') : 'Open run';
+    $('#rNote').textContent = R.mode === 'tread' ? FIXTXT.tread : FIXTXT[R.fix];
+    if (R.mode === 'tread') { $('#rSpd').textContent = R.mph.toFixed(1); $('#rInc').textContent = R.inc.toFixed(1); }
+  }
+  function runPause() {
+    var b = $('#rPlay'); var now = Date.now();
+    if (!R.paused) { R.accum += now - R.seg; R.paused = true; b.innerHTML = ic('play'); $('#rPhase').textContent = 'Paused'; }
+    else { R.seg = now; R.lastT = now; R.paused = false; R.last = null; b.innerHTML = ic('pause'); $('#rPhase').textContent = R.mode === 'tread' ? 'Treadmill run' : 'Outdoor run'; }
+  }
+  function runAskEnd() {
+    if (!R.paused) runPause();
+    var t = runElapsed() / 1000;
+    $('#rSheetTxt').textContent = 'Time ' + fmt(t) + '.' + (R.fix === 'none' && R.mode === 'gps' ? ' GPS did not track this run, so enter your distance.' : ' Adjust the distance if it is not right.');
+    $('#rMi').value = R.dist.toFixed(2);
+    $('#rSheet').hidden = false;
+  }
+  function closeRun() {
+    clearInterval(R.timer); stopGPS(); R.on = false;
+    try { speechSynthesis.cancel(); } catch (e) { /* ignore */ }
+    $('#runner').hidden = true; $('#runner').innerHTML = '';
+    if (!P.on) { unlock(); document.body.style.overflow = ''; }
+    render();
+  }
+  function saveRun(mi, secs, mode) {
+    if (!(mi > 0)) { toast('Enter a distance above 0 to save.'); return false; }
+    S.runs.push({ ts: Date.now(), d: ymd(), mi: r2(mi), secs: Math.round(secs), mode: mode });
+    var names = autoCheck('run'); save();
+    toast('Saved ' + r2(mi) + ' mi' + (names.length ? '. Checked off: ' + names.join(', ') : ''));
+    return true;
+  }
+
+  /* ---------- actions ---------- */
+  function startWorkoutById(id) { var w = wo(id); if (w) startPlayer(w); }
+
+  function buildCustom() {
+    var g = function (id, lo, hi, def) { var v = parseInt(($(id) || {}).value, 10); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : def; };
+    var work = g('#cWork', 5, 3600, 40), rest = g('#cRest', 0, 600, 20), rounds = g('#cRounds', 1, 99, 8), warm = g('#cWarm', 0, 600, 60);
+    var steps = [];
+    if (warm > 0) steps.push({ t: 'warm', n: 'Warm-up', d: warm, tip: 'Easy movement to get ready.' });
+    for (var r = 1; r <= rounds; r++) {
+      steps.push({ t: 'work', n: 'Work', d: work, r: 'Round ' + r + ' of ' + rounds });
+      if (rest > 0 && r < rounds) steps.push({ t: 'rest', n: 'Rest', d: rest });
+    }
+    var mins = Math.max(1, Math.round(steps.reduce(function (a, s) { return a + s.d; }, 0) / 60));
+    return { id: 'custom-x', cat: 'custom', name: 'Custom Timer', steps: steps, mins: mins };
+  }
+
+  function act(a, ds, el) {
+    switch (a) {
+      case 'tab': tab(ds.t); break;
+      case 'cat': go({ cat: ds.id, grp: 'All', wid: null }); break;
+      case 'grp': go({ grp: ds.id }); break;
+      case 'wo': go({ wid: ds.id }); break;
+      case 'back': if (V.wid) go({ wid: null }); else go({ cat: null, grp: 'All' }); break;
+      case 'start': startWorkoutById(ds.id); break;
+      case 'cstart': startPlayer(buildCustom()); break;
+      case 'preset': $('#cWork').value = ds.w; $('#cRest').value = ds.r; $('#cRounds').value = ds.n; break;
+      case 'newq': Q.i = (Q.i + 1 + Math.floor(Math.random() * (D.QUOTES.length - 1))) % D.QUOTES.length; render(); break;
+      case 'copy': copyText(ds.t); break;
+      case 'set': S.s[ds.k] = !S.s[ds.k]; save(); render(); break;
+      case 'testsound': audio(); primeVoice(); goBeep(); say('Sound check. Five, four, three, two, one. Go!', { interrupt: true }); break;
+      case 'reset': S = defState(); try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } save(); render(); toast('Data erased'); break;
+      case 'tvoice': S.s.voice = !S.s.voice; save(); syncToggles(); if (R.on) $('#rVoice').classList.toggle('off', !S.s.voice); break;
+      case 'tbeep': S.s.beeps = !S.s.beeps; save(); syncToggles(); break;
+      case 'pEnd': askEnd(); break;
+      case 'pKeep': $('#pSheet').hidden = true; if (P.paused) togglePause(); break;
+      case 'pSave': endSave(); break;
+      case 'pDiscard': closePlayer(); break;
+      case 'pPlay': togglePause(); break;
+      case 'pPrev': prev(); break;
+      case 'pNext': next(0); break;
+      case 'pClose': closePlayer(); break;
+      case 'rmode': R0.mode = ds.id; render(); break;
+      case 'rgoal': R0.goal = parseFloat(ds.v); render(); break;
+      case 'startrun': startRun(); break;
+      case 'rPause': runPause(); break;
+      case 'rEnd': runAskEnd(); break;
+      case 'rKeep': $('#rSheet').hidden = true; if (R.paused) runPause(); break;
+      case 'rSave': { var mi = parseFloat($('#rMi').value); if (saveRun(mi, runElapsed() / 1000, R.mode === 'tread' ? 'treadmill' : 'outdoor')) closeRun(); break; }
+      case 'rDiscard': closeRun(); break;
+      case 'spd': R.mph = Math.min(12, Math.max(1, r1(R.mph + parseFloat(ds.v)))); paintRun(); break;
+      case 'inc': R.inc = Math.min(D.MAX_INCLINE, Math.max(0, r1(R.inc + parseFloat(ds.v)))); paintRun(); break;
+      case 'logrun': {
+        var m = parseFloat($('#mlMi').value), mn = parseFloat($('#mlMin').value);
+        if (!(m > 0) || !(mn > 0)) { toast('Enter both miles and minutes.'); break; }
+        if (saveRun(m, mn * 60, 'manual')) { render(); }
+        break;
+      }
+      case 'chstart': {
+        S.ch[ds.id] = { start: ymd(), done: [] };
+        var today = ymd();
+        if (S.log.some(function (l) { return l.d === today; })) autoCheck('workout');
+        if (S.runs.some(function (r) { return r.d === today; })) autoCheck('run');
+        save(); go({ tab: 'chal', ch: ds.id }); toast('Challenge started. Day 1 is today.'); break;
+      }
+      case 'chopen': go({ tab: 'chal', ch: ds.id }); break;
+      case 'chback': go({ ch: null }); break;
+      case 'chgo': if (ds.cat === 'run') tab('run'); else go({ tab: 'train', cat: ds.cat, grp: 'All', wid: null, ch: null }); break;
+      case 'tday': { var st = chState(ds.id), n = parseInt(ds.n, 10); if (!st || n > st.dn) break; markDay(ds.id, n, st.s.done.indexOf(n) < 0); save(); render(); break; }
+      case 'chquit': delete S.ch[ds.id]; save(); go({ ch: null }); break;
+      default: break;
+    }
+  }
+
+  function copyText(t) {
+    var ok = function () { toast('Copied'); };
+    var fallback = function () {
+      try { var ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); ok(); }
+      catch (e) { toast('Press and hold the text to copy'); }
+    };
+    try { navigator.clipboard.writeText(t).then(ok, fallback); } catch (e) { fallback(); }
+  }
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-a]'); if (!el || el.disabled) return;
+    if (el.dataset.confirm && !el.dataset.armed) {
+      el.dataset.armed = '1'; var old = el.textContent; el.textContent = el.dataset.confirm;
+      setTimeout(function () { if (el.isConnected) { delete el.dataset.armed; el.textContent = old; } }, 3000);
+      return;
+    }
+    act(el.dataset.a, el.dataset, el);
+  });
+
+  render();
+  initCloud();
+})();
+</script></body></html>
