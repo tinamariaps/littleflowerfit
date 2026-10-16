@@ -251,6 +251,7 @@ nav#nav button.on svg { transform: translateY(-1px) scale(1.06); }
 :root[data-theme="dark"] #player .ringwrap::after { opacity: .17; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #player .ringwrap::after { opacity: .17; } }
 #player > .col { overflow-x: hidden; }
+#player .col > *:not(.ringwrap) { position: relative; z-index: 1; }
 .ringwrap svg { position: relative; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
 .ringwrap .bg { stroke: color-mix(in srgb, var(--phase, var(--accent)) 16%, var(--surface)); }
 .ringwrap .fg { stroke: var(--phase, var(--accent)); transition: stroke .3s; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--phase, var(--accent)) 55%, transparent)); }
@@ -292,7 +293,99 @@ nav#nav button.on svg { transform: translateY(-1px) scale(1.06); }
   .tile:active, .rowbtn:active, .btn:active, .chip:active, .tile:hover { transform: none; }
   #player .ringwrap::after { animation: none !important; }
 }
-</style><style>[hidden]{display:none!important} html{padding-top:env(safe-area-inset-top,0px)}</style></head><body>
+</style><style>[hidden]{display:none!important} html{padding-top:env(safe-area-inset-top,0px)}</style><script>/* Little Flower Plus: apply a Plus color theme before first paint */try{var lfp=JSON.parse(localStorage.getItem('lf.plus')||'null'),lfs=localStorage.getItem('lf.skin');if(lfp&&lfp.on===true&&lfs)document.documentElement.setAttribute('data-skin',lfs)}catch(e){}</script>
+<style>
+:root { --lf-flower: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='%23fff'%3E%3Cpath d='M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z' transform='rotate(0 60 60)'/%3E%3Cpath d='M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z' transform='rotate(72 60 60)'/%3E%3Cpath d='M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z' transform='rotate(144 60 60)'/%3E%3Cpath d='M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z' transform='rotate(216 60 60)'/%3E%3Cpath d='M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z' transform='rotate(288 60 60)'/%3E%3C/g%3E%3C/svg%3E"); }
+:root { --plus-bg: linear-gradient(135deg, #FFD54A, #FFA62B); --plus-ink: #2B0F20; --plus-shadow: rgba(230, 140, 0, .55); --plus-solid: #FFB23F; --plus-glow1: rgba(255, 196, 80, .38); --plus-glow2: rgba(255, 79, 139, .22); --plus-why: #C2185B; --plus-err: #C62828; --plus-ok: #0B7A55; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --plus-why: #FF8AB5; --plus-err: #FF8A80; --plus-ok: #5FE0B0; --plus-glow1: rgba(255, 196, 80, .18); } }
+:root[data-theme="dark"] { --plus-why: #FF8AB5; --plus-err: #FF8A80; --plus-ok: #5FE0B0; --plus-glow1: rgba(255, 196, 80, .18); }
+/* ---------- Little Flower Plus ---------- */
+.plus-badge { display: inline-flex; align-items: center; gap: 3px; vertical-align: middle; font-family: var(--body); font-size: 10.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; line-height: 1; padding: 4px 7px 4px 6px; border-radius: 999px; background: var(--plus-bg); color: var(--plus-ink); box-shadow: 0 4px 10px -4px var(--plus-shadow); white-space: nowrap; }
+.plus-badge svg { width: 11px; height: 11px; flex: none; }
+.tile .plus-badge { position: absolute; top: 14px; right: 12px; }
+.kicker .plus-badge { margin-left: 4px; letter-spacing: .05em; }
+.btn.plus-locked::before, .chip.plus-locked::before { content: ''; width: 13px; height: 13px; flex: none; background: currentColor; -webkit-mask: var(--plus-lock) center / contain no-repeat; mask: var(--plus-lock) center / contain no-repeat; }
+.card.plus-locked .chip, .card.plus-locked input { opacity: .62; }
+.card.plus-locked .chip.on { opacity: .8; }
+.tile.plus-locked b, .tile.plus-locked > span { opacity: .8; }
+:root { --plus-lock: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='5' y='10.5' width='14' height='10' rx='2.5'/%3E%3Cpath d='M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E"); }
+
+.plus-sheet { position: fixed; inset: 0; z-index: 85; display: flex; align-items: flex-end; justify-content: center; padding: 12px; background: rgba(30, 8, 20, .55); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); animation: fade .2s ease-out; }
+html.plus-open, html.plus-open body { overflow: hidden; }
+.plus-panel { position: relative; overflow: hidden; isolation: isolate; width: 100%; max-width: 480px; max-height: calc(100% - 8px); overflow-y: auto; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 28px; padding: 22px 20px calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow-lg); animation: sheet .35s var(--ease); }
+.plus-panel::before { content: ''; position: absolute; z-index: -1; left: -20%; right: -20%; top: -140px; height: 300px; background: radial-gradient(closest-side, var(--plus-glow1), transparent), radial-gradient(closest-side at 80% 60%, var(--plus-glow2), transparent); }
+.plus-x { position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; line-height: 1; color: var(--muted); background: var(--surface2); }
+.plus-mark { width: 64px; height: 64px; align-self: center; filter: drop-shadow(0 8px 16px var(--plus-shadow)); animation: spin 30s linear infinite; }
+.plus-mark svg { width: 100%; height: 100%; }
+.plus-panel .kicker { text-align: center; }
+.plus-panel h2 { text-align: center; font-size: 34px; font-weight: 900; }
+.plus-sub { text-align: center; font-size: 15.5px; color: var(--fg); text-wrap: balance; }
+.plus-why { text-align: center; font-size: 14px; font-weight: 700; color: var(--plus-why); min-height: 0; }
+.plus-why:empty { display: none; }
+.plus-list { list-style: none; margin: 2px 0; padding: 12px 14px; display: flex; flex-direction: column; gap: 7px; background: var(--surface2); border-radius: 18px; font-size: 14.5px; font-weight: 600; }
+.plus-list li { display: flex; gap: 9px; align-items: flex-start; line-height: 1.3; }
+.plus-list li::before { content: ''; flex: none; width: 18px; height: 18px; margin-top: 0; border-radius: 50%; background: var(--plus-bg); -webkit-mask: none; box-shadow: inset 0 0 0 0 transparent;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23fff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"), var(--plus-bg); background-size: 14px, cover; background-position: center; background-repeat: no-repeat; }
+.plus-fine { text-align: center; }
+.plus-code { display: flex; flex-direction: column; gap: 6px; padding-top: 6px; border-top: 1px dashed var(--line); margin-top: 4px; }
+.plus-code .field-l { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding-top: 6px; }
+.plus-code .row { gap: 8px; }
+.plus-code input { flex: 1; min-width: 0; font: inherit; font-size: 16px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; min-height: 46px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 0 14px; }
+.plus-code input::placeholder { text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--muted); }
+.plus-code input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent); }
+.plus-code .btn.small { min-height: 46px; }
+.plus-msg { font-size: 13.5px; font-weight: 700; min-height: 0; }
+.plus-msg:empty { display: none; }
+.plus-msg.err { color: var(--plus-err); }
+.plus-msg.ok { color: var(--plus-ok); }
+
+.plus-card { position: relative; overflow: hidden; isolation: isolate; border-color: color-mix(in srgb, var(--plus-solid) 35%, var(--line)); }
+.plus-card::before { content: ''; position: absolute; z-index: -1; right: -60px; top: -70px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, var(--plus-glow1), transparent 68%); }
+.plus-card-top { display: flex; align-items: center; gap: 12px; }
+.plus-card-top svg { width: 46px; height: 46px; flex: none; filter: drop-shadow(0 4px 8px var(--plus-shadow)); }
+.plus-card-title { font-family: var(--display); font-weight: 900; font-size: 24px; text-transform: uppercase; line-height: 1; display: block; margin-top: 2px; }
+.plus-status { font-size: 12px; font-weight: 800; letter-spacing: .04em; padding: 6px 11px; border-radius: 999px; background: var(--surface2); color: var(--muted); border: 1px solid var(--line); white-space: nowrap; }
+.plus-status.on { background: var(--plus-bg); color: var(--plus-ink); border-color: transparent; box-shadow: 0 6px 14px -6px var(--plus-shadow); }
+.plus-price { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.plus-price span { text-align: center; padding: 10px 4px; border-radius: 14px; background: var(--surface2); border: 1px solid var(--line); font-size: 12.5px; font-weight: 700; color: var(--muted); }
+.plus-price b { display: block; font-family: var(--display); font-size: 26px; font-weight: 900; line-height: 1; color: var(--fg); }
+.plus-skins { display: flex; flex-direction: column; gap: 6px; }
+.plus-skins .chip { gap: 6px; }
+.plus-skins .chip svg { width: 12px; height: 12px; }
+.plus-swatch { width: 14px; height: 14px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px var(--surface); }
+.plus-sw-sunshine { background: linear-gradient(135deg, #FFD54A, #FF9F2E); }
+.plus-sw-rose { background: linear-gradient(135deg, #FF4F8B, #E8145F); }
+
+/* ---------- ambient floating flowers (behind everything, CSS only) ---------- */
+.wrap { position: relative; z-index: 1; }
+.lf-ambient { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; contain: strict; }
+.lf-ambient i { position: absolute; left: var(--x); bottom: calc(-1 * var(--s) - 2vh); width: var(--s); height: var(--s); opacity: var(--o); animation: lf-rise var(--d) linear var(--dl) infinite; will-change: transform; }
+.lf-ambient i::before { content: ''; position: absolute; inset: 0; background: var(--c); -webkit-mask: var(--lf-flower) center / contain no-repeat; mask: var(--lf-flower) center / contain no-repeat; animation: lf-sway var(--sw) ease-in-out var(--dl) infinite alternate; will-change: transform; }
+@keyframes lf-rise { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(0, calc(-100vh - var(--s) - 6vh), 0); } }
+@keyframes lf-sway { from { transform: translate3d(calc(-1 * var(--a)), 0, 0) rotate(-28deg); } to { transform: translate3d(var(--a), 0, 0) rotate(32deg); } }
+@media (prefers-reduced-motion: reduce) { .lf-ambient { display: none !important; } .plus-mark { animation: none !important; } }
+.plus-trial, .plus-trial:hover { text-decoration: none; }
+/* Plus color theme: Sunshine (gold main, rose highlight, plum ink on gold) */
+:root[data-skin="sunshine"] { --accent: #E89A00; --grad: linear-gradient(135deg, #FFD54A 0%, #FFBE2E 50%, #FF9F2E 100%); --grad-text: linear-gradient(100deg, #B86200 10%, #D60F5A 90%); --c-work: #F5A300; --shadow: 0 10px 28px -8px rgba(230, 140, 0, .45); --shadow-lg: 0 18px 40px -14px rgba(210, 120, 0, .45); --peach: #FFC94D;
+  --plus-bg: linear-gradient(135deg, #FF4F8B, #E8145F); --plus-ink: #FFFFFF; --plus-shadow: rgba(232, 20, 95, .5); --plus-solid: #E8145F; }
+:root[data-skin="sunshine"] .card.hero, :root[data-skin="sunshine"] .card.hero .kicker { color: #2B0F20; }
+:root[data-skin="sunshine"] .card.hero::before { background: radial-gradient(circle, rgba(255, 79, 139, .42), rgba(255, 79, 139, 0) 68%); }
+:root[data-skin="sunshine"] .card.hero > .kicker:first-child::before { background: #E8145F; box-shadow: 0 0 0 3px rgba(232, 20, 95, .25); }
+:root[data-skin="sunshine"] .hero .btn { background: rgba(43, 15, 32, .08); color: #2B0F20; border-color: rgba(43, 15, 32, .28); }
+:root[data-skin="sunshine"] .hero .btn:first-of-type { background: #2B0F20; color: #FFE58A; border-color: #2B0F20; }
+:root[data-skin="sunshine"] .btn.primary, :root[data-skin="sunshine"] .chip.on, :root[data-skin="sunshine"] nav#nav button.on, :root[data-skin="sunshine"] .day.done, :root[data-skin="sunshine"] .ctrls .icon.big { color: #2B0F20; }
+:root[data-skin="sunshine"] .btn.primary, :root[data-skin="sunshine"] .chip.on, :root[data-skin="sunshine"] nav#nav button.on { box-shadow: 0 8px 18px -8px rgba(230, 140, 0, .75); }
+:root[data-skin="sunshine"] .bar > i { background: linear-gradient(90deg, #FFD54A, #FFB21C 60%, #FF8A2E); }
+:root[data-skin="sunshine"] .week i { background: linear-gradient(180deg, #FFD54A, #FF9F2E); }
+:root[data-skin="sunshine"] .week div:last-child { color: #E8145F; }
+:root[data-skin="sunshine"] .week div:last-child i { background: linear-gradient(180deg, #FF4F8B, #E8145F); }
+:root[data-skin="sunshine"] .day.today { border-color: #E8145F; color: #E8145F; }
+:root[data-skin="sunshine"] .phase { color: color-mix(in srgb, var(--phase, var(--accent)) 50%, var(--fg)); }
+@media (prefers-color-scheme: light) { :root[data-skin="sunshine"]:not([data-theme="dark"]) { --bg: #FFFBF2; --bg2: #FFF0C7; --surface2: #FFF6DE; --line: #F2E1B5; --logo-gap: #FFFBF2; } }
+@media (prefers-color-scheme: dark) { :root[data-skin="sunshine"]:not([data-theme="light"]) { --accent: #FFC83D; --c-work: #FFC83D; --grad-text: linear-gradient(100deg, #FFD061 10%, #FF85B0 90%); } }
+</style>
+</head><body>
+<div class="lf-ambient" aria-hidden="true"><i style="--x:6%;--s:34px;--d:26s;--dl:-3s;--o:0.16;--sw:5.5s;--a:18px;--c:linear-gradient(135deg, #FF4F8B, #E8145F)"></i><i style="--x:18%;--s:18px;--d:21s;--dl:-14s;--o:0.12;--sw:4.2s;--a:14px;--c:linear-gradient(135deg, #FF9B71, #FF5E57)"></i><i style="--x:31%;--s:46px;--d:33s;--dl:-22s;--o:0.09;--sw:7.0s;--a:24px;--c:linear-gradient(135deg, #FFD36B, #FFA22B)"></i><i style="--x:47%;--s:24px;--d:24s;--dl:-8s;--o:0.14;--sw:5.0s;--a:16px;--c:linear-gradient(135deg, #F0306A, #FF9B71)"></i><i style="--x:60%;--s:38px;--d:29s;--dl:-18s;--o:0.11;--sw:6.4s;--a:22px;--c:linear-gradient(135deg, #FF4F8B, #E8145F)"></i><i style="--x:72%;--s:16px;--d:19s;--dl:-5s;--o:0.17;--sw:3.8s;--a:12px;--c:linear-gradient(135deg, #FF9B71, #FF5E57)"></i><i style="--x:84%;--s:30px;--d:27s;--dl:-11s;--o:0.13;--sw:5.8s;--a:20px;--c:linear-gradient(135deg, #FFD36B, #FFA22B)"></i><i style="--x:93%;--s:22px;--d:23s;--dl:-20s;--o:0.15;--sw:4.6s;--a:14px;--c:linear-gradient(135deg, #F0306A, #FF9B71)"></i><i style="--x:40%;--s:14px;--d:17s;--dl:-2s;--o:0.18;--sw:3.4s;--a:10px;--c:linear-gradient(135deg, #FF9B71, #FF5E57)"></i></div>
 <div class="wrap">
   <header class="top"><div class="brand" role="img" aria-label="Little Flower Fit"><svg viewBox="0 0 120 120" aria-hidden="true" focusable="false"><defs><linearGradient id="lfPt" x1="0" y1="1" x2="0.3" y2="0"><stop offset="0" stop-color="#C80D57"/><stop offset=".5" stop-color="#F0306A"/><stop offset="1" stop-color="#FF9B71"/></linearGradient><linearGradient id="lfGd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD36B"/><stop offset="1" stop-color="#FFA22B"/></linearGradient></defs><path id="lfP" d="M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z" fill="url(#lfPt)" style="stroke:var(--logo-gap,#fff)" stroke-width="3" stroke-linejoin="round"/><use href="#lfP" transform="rotate(72 60 60)"/><use href="#lfP" transform="rotate(144 60 60)"/><use href="#lfP" transform="rotate(216 60 60)"/><use href="#lfP" transform="rotate(288 60 60)"/><circle cx="60" cy="60" r="15" style="fill:var(--logo-gap,#fff)"/><circle cx="60" cy="60" r="12.5" fill="url(#lfGd)"/><path d="M62.5 50 L53 62.2 H59.4 L57.3 70 L66.8 57.8 H60.4Z" fill="#fff"/></svg><span>Little Flower <span class="fit">Fit</span></span></div><div class="date" id="today"></div></header>
   <main id="view"></main>
@@ -301,6 +394,241 @@ nav#nav button.on svg { transform: translateY(-1px) scale(1.06); }
 <div id="player" class="overlay" hidden></div>
 <div id="runner" class="overlay" hidden></div>
 <div id="toast" hidden></div>
+<script>
+/* ============================================================
+   Little Flower Plus (membership add-on)
+   ------------------------------------------------------------
+   Edit this after creating the ThriveCart product: */
+const PLUS_CHECKOUT_URL = 'https://neurorevolution.thrivecart.com/little-flower-plus/';
+/* Everything below is self-contained. It only reads the app data key
+   (glowfit.v1) and never writes to it. Plus status lives in 'lf.plus'.
+   ============================================================ */
+(function () {
+  'use strict';
+  var APP = 'fit';
+  var PLUS_KEY = 'lf.plus', SKIN_KEY = 'lf.skin', DATA_KEY = 'glowfit.v1';
+  /* SHA-256 of the UPPERCASED, trimmed codes. Plain codes are never stored here. */
+  var H_MEMBER = ["c78de020725f8de41d58ceeee7bfcaec0bb8107df1e90054b0505e6f95dcaeaa"];
+  var H_FOREVER = ["40f666a4387b16acf2b08b7992824c7cb13d841c65af2539d9373011d6a0e14e", "9aa9f76db40a0c0bb62100a20e5f1302dd642aa4619c74864dd615d399abbe25", "e1bbc4dfdb7fc5abe7f43a8dc1c6e4d532a936bbb1ebed0c6a4f823277c31d0c", "ebb02f5db23fa972899f9a0717ea21013cbf12584f65a69c54fbfb0db856c066", "383c72580f4d7a5e98428f50ba1b8ca53de96123d6fd964c7ca7494a57bc665c"];
+  var CFG = {"classic": "Classic Rose", "skins": [{"id": "sunshine", "name": "Sunshine"}], "other": "Clean", "dailyWord": "workouts, Today’s Push, run tracking, streaks and the 7-day challenges", "unlocks": ["10 longer challenges, from the 14-Day Glow Up to 60-Day Strong", "Custom Timer: build your own work and rest intervals", "Sunshine color theme"], "bothLine": "Plus everything in Little Flower Clean Plus: longer goals, kids’ points, the supply caddy and the Rose theme", "why": {"long": "Challenges longer than 7 days are part of Plus.", "custom": "The Custom Timer is part of Plus.", "skin": "The Sunshine theme is part of Plus."}, "logo": "<svg viewBox=\"0 0 120 120\" aria-hidden=\"true\" focusable=\"false\">\n<defs><linearGradient id=\"plpt\" x1=\"0\" y1=\"1\" x2=\"0.3\" y2=\"0\"><stop offset=\"0\" stop-color=\"#C80D57\"/><stop offset=\".5\" stop-color=\"#F0306A\"/><stop offset=\"1\" stop-color=\"#FF9B71\"/></linearGradient>\n<linearGradient id=\"plgd\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFD36B\"/><stop offset=\"1\" stop-color=\"#FFA22B\"/></linearGradient></defs><path id=\"plp\" d=\"M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z\" fill=\"url(#plpt)\" stroke=\"#fff\" stroke-width=\"2.5\" stroke-linejoin=\"round\"/><use href=\"#plp\" transform=\"rotate(72 60 60)\"/><use href=\"#plp\" transform=\"rotate(144 60 60)\"/><use href=\"#plp\" transform=\"rotate(216 60 60)\"/><use href=\"#plp\" transform=\"rotate(288 60 60)\"/><circle cx=\"60\" cy=\"60\" r=\"15\" fill=\"#fff\"/><circle cx=\"60\" cy=\"60\" r=\"12.5\" fill=\"url(#plgd)\"/><path d=\"M62.5 50 L53 62.2 H59.4 L57.3 70 L66.8 57.8 H60.4Z\" fill=\"#fff\"/></svg>"};
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var LOCK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+  var BADGE = '<span class="plus-badge" title="Little Flower Plus">' + LOCK + 'Plus</span>';
+
+  /* ---------- status ---------- */
+  function readPlus() { try { var o = JSON.parse(localStorage.getItem(PLUS_KEY) || 'null'); return o && o.on === true && typeof o.h === 'string' ? o : null; } catch (e) { return null; } }
+  var plus = readPlus();
+  function isPlus() { return !!plus; }
+  function kindOf(h) { return H_FOREVER.indexOf(h) >= 0 ? 'forever' : (H_MEMBER.indexOf(h) >= 0 ? 'member' : null); }
+  function sha256(text) {
+    if (!(window.crypto && crypto.subtle && window.TextEncoder)) return Promise.reject(new Error('nocrypto'));
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function (buf) {
+      return Array.prototype.map.call(new Uint8Array(buf), function (b) { return ('0' + b.toString(16)).slice(-2); }).join('');
+    });
+  }
+  function checkCode(raw) {
+    var c = String(raw || '').trim().toUpperCase();
+    if (!c) return Promise.resolve(null);
+    return sha256(c).then(function (h) { var k = kindOf(h); return k ? { kind: k, h: h } : null; });
+  }
+  function savePlus(res, via) {
+    plus = { v: 1, on: true, kind: res.kind, h: res.h, at: Date.now(), via: via || 'app' };
+    try { localStorage.setItem(PLUS_KEY, JSON.stringify(plus)); } catch (e) { /* storage unavailable: unlocked for this visit */ }
+  }
+  /* re-check a stored unlock (lets Tina rotate the member code later); never touches app data */
+  if (plus) sha256('x').then(function () { if (!kindOf(plus.h)) { plus = null; applySkin(); refresh(); } }, function () { /* no crypto here: keep */ });
+
+  /* ---------- color themes (Plus) ---------- */
+  function skin() { try { return localStorage.getItem(SKIN_KEY) || ''; } catch (e) { return ''; } }
+  function applySkin() {
+    var s = isPlus() ? skin() : '';
+    if (s && CFG.skins.some(function (k) { return k.id === s; })) document.documentElement.setAttribute('data-skin', s);
+    else document.documentElement.removeAttribute('data-skin');
+  }
+
+  /* ---------- what is gated ---------- */
+  function challenges() { var D = window.GF || window.GH; return D ? D.CHALLENGES : []; }
+  function isLong(id) { var c = challenges().filter(function (x) { return x.id === id; })[0]; return !!(c && c.days > 7); }
+  function started(id) { try { var s = JSON.parse(localStorage.getItem(DATA_KEY) || '{}'); return !!(s.ch && s.ch[id]); } catch (e) { return false; } }
+  function gated(el) {
+    var a = el.getAttribute('data-a'), ds = el.dataset;
+    if (a === 'chstart' && isLong(ds.id)) return 'long';
+    if (APP === 'fit') {
+      /* someone already doing the 30-Day Plank Challenge keeps the Custom Timer so they can finish it */
+      if ((a === 'cat' && ds.id === 'custom') || (a === 'chgo' && ds.cat === 'custom')) return started('plank30') ? null : 'custom';
+    } else {
+      if (a === 'kadd' || a === 'twho') return 'kids';
+      if (a === 'sup' || a === 'copysup') return 'supplies';
+    }
+    return null;
+  }
+  var pending = null;
+  window.addEventListener('click', function (e) {
+    var el = e.target && e.target.closest ? e.target.closest('[data-a]') : null;
+    if (!el || el.disabled || isPlus()) return;
+    var f = gated(el); if (!f) return;
+    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+    pending = el; openSheet(f);
+  }, true);
+
+  /* ---------- badges + Me card (re-applied after every app render) ---------- */
+  function decorate() {
+    var view = $('#view'); if (!view) return;
+    var free = !isPlus();
+    Array.prototype.forEach.call(view.querySelectorAll('.plus-badge'), function (b) { if (!free) b.remove(); });
+    Array.prototype.forEach.call(view.querySelectorAll('.plus-locked'), function (b) { if (!free) b.classList.remove('plus-locked'); });
+    if (free) {
+      Array.prototype.forEach.call(view.querySelectorAll('[data-a="chstart"]'), function (btn) {
+        if (!isLong(btn.dataset.id)) return;
+        btn.classList.add('plus-locked');
+        var card = btn.closest('.card'), b = card && card.querySelector('.row.between > b');
+        if (b && !b.querySelector('.plus-badge')) b.insertAdjacentHTML('beforeend', ' ' + BADGE);
+      });
+      if (APP === 'fit') {
+        var t = view.querySelector('.tile[data-id="custom"]');
+        if (t && !started('plank30') && !t.querySelector('.plus-badge')) { t.insertAdjacentHTML('beforeend', BADGE); t.classList.add('plus-locked'); }
+      } else {
+        [['kadd', 'kids'], ['copysup', 'supplies']].forEach(function (p) {
+          var btn = view.querySelector('[data-a="' + p[0] + '"]'), card = btn && btn.closest('.card');
+          if (!card) return;
+          card.classList.add('plus-locked');
+          var k = card.querySelector('.kicker');
+          if (k && !k.querySelector('.plus-badge')) k.insertAdjacentHTML('beforeend', ' ' + BADGE);
+        });
+        Array.prototype.forEach.call(view.querySelectorAll('[data-a="twho"]'), function (c) { c.classList.add('plus-locked'); });
+      }
+    }
+    meCard(view);
+  }
+  function meCard(view) {
+    var reset = view.querySelector('[data-a="reset"]'); if (!reset) { return; }
+    var old = view.querySelector('#plusCard'), html = cardHTML();
+    if (old && old.getAttribute('data-state') === (isPlus() ? plus.kind : 'free') + '|' + skin()) return;
+    if (old) old.remove();
+    var head = view.querySelector('.stack > div:first-child');
+    if (head) head.insertAdjacentHTML('afterend', html);
+  }
+  function skinChips() {
+    var cur = isPlus() ? skin() : '';
+    return '<div class="plus-skins"><span class="kicker">Color theme</span><div class="tabs">' +
+      '<button class="chip ' + (cur ? '' : 'on') + '" data-plus="skin" data-skin="">' + esc(CFG.classic) + '</button>' +
+      CFG.skins.map(function (k) { return '<button class="chip ' + (cur === k.id ? 'on' : '') + '" data-plus="skin" data-skin="' + k.id + '"><i class="plus-swatch plus-sw-' + k.id + '"></i>' + esc(k.name) + (isPlus() ? '' : ' ' + LOCK) + '</button>'; }).join('') +
+      '</div></div>';
+  }
+  function cardHTML() {
+    var st = isPlus() ? plus.kind : 'free';
+    var top = '<div class="plus-card-top">' + CFG.logo + '<div class="grow"><div class="kicker">Little Flower Plus</div><b class="plus-card-title">' +
+      (isPlus() ? 'You’re a Plus member' : 'Free plan') + '</b></div><span class="plus-status ' + (isPlus() ? 'on' : '') + '">' + (isPlus() ? '✓ Plus' : 'Free') + '</span></div>';
+    var body;
+    if (isPlus()) {
+      body = '<p class="note">' + (plus.kind === 'forever' ? 'Friends &amp; family: free forever. Thank you for being here.' : 'Thank you for supporting Little Flower. Your membership covers both apps.') + '</p>' +
+        '<ul class="plus-list plus-list-on">' + CFG.unlocks.map(function (u) { return '<li>' + esc(u) + '</li>'; }).join('') + '</ul>' + skinChips() +
+        '<p class="note">Using Little Flower ' + esc(CFG.other) + ' too? Unlock it there with the same code.</p>';
+    } else {
+      body = '<p class="note">Your daily ' + esc(CFG.dailyWord) + ' stays free, always. Plus adds:</p>' +
+        '<ul class="plus-list">' + CFG.unlocks.map(function (u) { return '<li>' + esc(u) + '</li>'; }).join('') + '</ul>' +
+        '<div class="plus-price"><span><b>$1.99</b>/mo</span><span><b>$12</b>/yr</span><span><b>$29</b> lifetime</span></div>' +
+        '<a class="btn primary block plus-trial" href="' + esc(PLUS_CHECKOUT_URL) + '" target="_blank" rel="noopener" data-plus="trial">Start my free trial</a>' +
+        '<p class="note plus-fine">7-day free trial. One membership unlocks both apps.</p>' +
+        '<div class="plus-code"><label class="field-l" for="plusCodeMe">Have a code?</label><div class="row"><input id="plusCodeMe" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Enter your code"><button class="btn small" data-plus="unlock" data-input="plusCodeMe">Unlock</button></div><p class="plus-msg" role="status" aria-live="polite"></p></div>' + skinChips();
+    }
+    return '<div class="card stack plus-card' + (isPlus() ? ' is-plus' : '') + '" id="plusCard" data-state="' + st + '|' + esc(skin()) + '">' + top + body + '</div>';
+  }
+
+  /* ---------- the bottom sheet ---------- */
+  var sheet = null;
+  function buildSheet() {
+    if (sheet) return sheet;
+    sheet = document.createElement('div');
+    sheet.id = 'plusSheet'; sheet.className = 'plus-sheet'; sheet.hidden = true;
+    sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-labelledby', 'plusTitle');
+    sheet.innerHTML = '<div class="plus-panel"><button class="plus-x" data-plus="close" aria-label="Close">×</button>' +
+      '<div class="plus-mark">' + CFG.logo + '</div><div class="kicker">Little Flower Plus</div>' +
+      '<h2 id="plusTitle">Unlock Little Flower Plus</h2>' +
+      '<p class="plus-sub">Both apps, one membership: <b>$1.99/mo</b> or <b>$12/yr</b>, with a <b>7-day free trial</b>.</p>' +
+      '<p class="plus-why" id="plusWhy"></p>' +
+      '<ul class="plus-list">' + CFG.unlocks.map(function (u) { return '<li>' + esc(u) + '</li>'; }).join('') + '<li>' + esc(CFG.bothLine) + '</li></ul>' +
+      '<a class="btn primary block plus-trial" href="' + esc(PLUS_CHECKOUT_URL) + '" target="_blank" rel="noopener" data-plus="trial">Start my free trial</a>' +
+      '<p class="note plus-fine">Prefer to pay once? Lifetime is $29. Checkout and the free trial are handled securely by ThriveCart.</p>' +
+      '<div class="plus-code"><label class="field-l" for="plusCode">Have a code?</label><div class="row"><input id="plusCode" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Enter your code"><button class="btn small" data-plus="unlock" data-input="plusCode">Unlock</button></div>' +
+      '<p class="plus-msg" id="plusMsg" role="status" aria-live="polite"></p></div>' +
+      '<button class="btn ghost block" data-plus="close">Maybe later</button></div>';
+    document.body.appendChild(sheet);
+    return sheet;
+  }
+  var lastFocus = null;
+  function openSheet(feature) {
+    var s = buildSheet();
+    $('#plusWhy', s).textContent = CFG.why[feature] || '';
+    $('#plusMsg', s).textContent = ''; $('#plusMsg', s).className = 'plus-msg'; $('#plusCode', s).value = '';
+    setTrialLinks();
+    lastFocus = document.activeElement;
+    s.hidden = false; document.documentElement.classList.add('plus-open');
+    setTimeout(function () { var b = $('.plus-trial', s); if (b) b.focus({ preventScroll: true }); }, 60);
+  }
+  function closeSheet() {
+    if (!sheet || sheet.hidden) return;
+    sheet.hidden = true; document.documentElement.classList.remove('plus-open'); pending = null;
+    if (lastFocus && lastFocus.focus && lastFocus.isConnected) lastFocus.focus({ preventScroll: true });
+  }
+  function setTrialLinks() { Array.prototype.forEach.call(document.querySelectorAll('[data-plus="trial"]'), function (a) { a.href = PLUS_CHECKOUT_URL; }); }
+
+  function tryUnlock(btn) {
+    var input = document.getElementById(btn.getAttribute('data-input')), box = btn.closest('.plus-code'), msg = box && box.querySelector('.plus-msg');
+    var say = function (t, ok) { if (msg) { msg.textContent = t; msg.className = 'plus-msg ' + (ok ? 'ok' : 'err'); } };
+    var val = input ? input.value : '';
+    if (!String(val).trim()) { say('Type your code first.', false); if (input) input.focus(); return; }
+    btn.disabled = true;
+    checkCode(val).then(function (res) {
+      btn.disabled = false;
+      if (!res) { say('Hmm, that code didn’t work. Check the spelling and try again.', false); if (input) input.select(); return; }
+      savePlus(res, 'app'); applySkin();
+      say(res.kind === 'forever' ? 'Unlocked forever. Welcome to Plus! 🌸' : 'Welcome to Little Flower Plus! 🌸', true);
+      var again = pending; pending = null;
+      setTimeout(function () {
+        if (sheet && !sheet.hidden) { sheet.hidden = true; document.documentElement.classList.remove('plus-open'); }
+        refresh();
+        if (again && again.isConnected) again.click();
+      }, 900);
+    }, function () { btn.disabled = false; say('This browser can’t check codes here. Open the app at its https:// address and try again.', false); });
+  }
+  function refresh() {
+    var obs = window.__lfPlusObs; if (obs) obs.disconnect();
+    decorate();
+    if (obs) observe();
+  }
+  document.addEventListener('click', function (e) {
+    var el = e.target && e.target.closest ? e.target.closest('[data-plus]') : null;
+    if (!el) { if (sheet && !sheet.hidden && e.target === sheet) closeSheet(); return; }
+    var k = el.getAttribute('data-plus');
+    if (k === 'close') closeSheet();
+    else if (k === 'unlock') tryUnlock(el);
+    else if (k === 'trial') { el.href = PLUS_CHECKOUT_URL; }
+    else if (k === 'skin') {
+      var v = el.getAttribute('data-skin') || '';
+      if (v && !isPlus()) { pending = null; openSheet('skin'); return; }
+      try { if (v) localStorage.setItem(SKIN_KEY, v); else localStorage.removeItem(SKIN_KEY); } catch (er) { /* ignore */ }
+      applySkin(); refresh();
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeSheet();
+    if (e.key === 'Enter' && e.target && e.target.id && /^plusCode/.test(e.target.id)) { var b = e.target.parentNode.querySelector('[data-plus="unlock"]'); if (b) tryUnlock(b); }
+  });
+
+  /* ---------- watch the app's renders ---------- */
+  function observe() { window.__lfPlusObs.observe($('#view'), { childList: true, subtree: true }); }
+  applySkin();
+  if ($('#view') && window.MutationObserver) {
+    window.__lfPlusObs = new MutationObserver(function () { refresh(); });
+    observe();
+  }
+  document.addEventListener('DOMContentLoaded', refresh);
+  window.LFPlus = { isPlus: isPlus, open: openSheet };
+})();
+</script>
+
 <script>/* Little Flower Fit data: categories, workouts, quotes, challenges */
 (function () {
   'use strict';
