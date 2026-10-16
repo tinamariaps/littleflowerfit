@@ -293,6 +293,31 @@ nav#nav button.on svg { transform: translateY(-1px) scale(1.06); }
   .tile:active, .rowbtn:active, .btn:active, .chip:active, .tile:hover { transform: none; }
   #player .ringwrap::after { animation: none !important; }
 }
+
+/* Daily nudge signup (Kit form 10054259) */
+.nudge, .nudge-on { --nudge-grad: var(--grad); --nudge-dot: var(--gold); --nudge-tint: color-mix(in srgb, var(--accent) 7%, var(--surface)); --nudge-ok: var(--accent); }
+.nudge { position: relative; overflow: hidden; isolation: isolate; background: var(--nudge-tint); padding: 20px 16px 16px; gap: 12px; }
+.nudge::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 5px; background: var(--nudge-grad); }
+.nudge::after { content: ''; position: absolute; z-index: -1; width: 120px; height: 120px; right: -34px; top: -30px; opacity: .14; background: var(--nudge-grad); -webkit-mask: var(--lf-flower) center / contain no-repeat; mask: var(--lf-flower) center / contain no-repeat; animation: spin 40s linear infinite; }
+.nudge .kicker { display: inline-flex; align-items: center; gap: 6px; }
+.nudge .kicker::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--nudge-dot); box-shadow: 0 0 0 3px color-mix(in srgb, var(--nudge-dot) 25%, transparent); }
+.nudge h2 { font-size: 30px; padding-right: 40px; }
+.nudge p.nudge-line { font-size: 15px; line-height: 1.45; color: var(--fg); opacity: .88; }
+.nudge form { display: flex; flex-direction: column; gap: 10px; margin: 0; }
+.nudge .field label { font-size: 11px; }
+.nudge .field label i { font-style: normal; font-weight: 600; letter-spacing: .02em; text-transform: none; opacity: .8; }
+.nudge input { font: inherit; font-size: 17px; font-weight: 600; width: 100%; min-height: 50px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 0 14px; transition: border-color .2s, box-shadow .2s; -webkit-appearance: none; appearance: none; }
+.nudge input::placeholder { color: var(--muted); opacity: .7; font-weight: 500; }
+.nudge input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent); outline: none; }
+.nudge .btn.primary { margin-top: 4px; }
+.nudge .btn.primary:disabled { opacity: .6; cursor: progress; }
+.nudge .nudge-msg { font-size: 14px; font-weight: 600; color: var(--muted); min-height: 0; }
+.nudge .nudge-msg:empty { display: none; }
+.nudge .nudge-msg.ok { font-size: 17px; font-weight: 800; color: var(--fg); }
+.nudge .nudge-fine { font-size: 12px; color: var(--muted); text-align: center; }
+.nudge-on { display: flex; align-items: center; gap: 10px; padding: 12px 16px; font-size: 14px; font-weight: 700; color: var(--muted); }
+.nudge-on::before { content: ''; width: 22px; height: 22px; flex: none; background: var(--nudge-grad); -webkit-mask: var(--lf-flower) center / contain no-repeat; mask: var(--lf-flower) center / contain no-repeat; }
+@media (prefers-reduced-motion: reduce) { .nudge::after { animation: none; } }
 </style><style>[hidden]{display:none!important} html{padding-top:env(safe-area-inset-top,0px)}</style><script>/* Little Flower Plus: apply a Plus color theme before first paint */try{var lfp=JSON.parse(localStorage.getItem('lf.plus')||'null'),lfs=localStorage.getItem('lf.skin');if(lfp&&lfp.on===true&&lfs)document.documentElement.setAttribute('data-skin',lfs)}catch(e){}</script>
 <style>
 :root { --lf-flower: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='%23fff'%3E%3Cpath d='M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z' transform='rotate(0 60 60)'/%3E%3Cpath d='M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z' transform='rotate(72 60 60)'/%3E%3Cpath d='M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z' transform='rotate(144 60 60)'/%3E%3Cpath d='M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z' transform='rotate(216 60 60)'/%3E%3Cpath d='M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z' transform='rotate(288 60 60)'/%3E%3C/g%3E%3C/svg%3E"); }
@@ -1289,6 +1314,49 @@ const PLUS_CHECKOUT_URL = 'https://neurorevolution.thrivecart.com/little-flower-
   var Q = { i: Math.floor(Math.random() * D.QUOTES.length) };
   var R0 = { mode: 'gps', goal: 1, spd: 5.0, inc: 1 };
   function go(p) { Object.assign(V, p); render(); window.scrollTo(0, 0); }
+
+  /* ---------- daily nudge email signup (Kit form 10054259, no backend) ---------- */
+  var NUDGE_KEY = 'lf.nudge', NUDGE_URL = 'https://app.kit.com/forms/10054259/subscriptions';
+  function nudgeOn() { try { return localStorage.getItem(NUDGE_KEY) === '1'; } catch (e) { return false; } }
+  function nudgeCard(where) {
+    if (nudgeOn()) return '<div class="card nudge-on" role="note">You’re getting daily nudges 🌸</div>';
+    var id = 'nudge-' + where;
+    return '<section class="card stack nudge" aria-labelledby="' + id + '-h"><div class="kicker">Daily nudge · free</div>' +
+      '<h2 id="' + id + '-h">One small step a day. That’s it.</h2>' +
+      '<p class="nudge-line">For 30 days, I’ll send you one tiny step (a few minutes of movement or a quick 10-minute clean) from one stuck, busy mom to another. Free, short, and no shame if you miss a day.</p>' +
+      '<form class="nudge-form" novalidate>' +
+      '<div class="field"><label for="' + id + '-name">First name <i>(optional)</i></label><input id="' + id + '-name" name="fields[first_name]" type="text" autocomplete="given-name" autocapitalize="words" enterkeyhint="next" placeholder="Your first name"></div>' +
+      '<div class="field"><label for="' + id + '-email">Email</label><input id="' + id + '-email" name="email_address" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" enterkeyhint="send" required placeholder="you@example.com" aria-describedby="' + id + '-msg"></div>' +
+      '<button class="btn primary block" type="submit">Send me a daily nudge</button>' +
+      '<p class="nudge-msg" id="' + id + '-msg" role="status" aria-live="polite"></p>' +
+      '<p class="nudge-fine">One short email a day. Unsubscribe anytime.</p></form></section>';
+  }
+  document.addEventListener('submit', function (e) {
+    var f = e.target; if (!f || !f.classList || !f.classList.contains('nudge-form')) return;
+    e.preventDefault();
+    var em = f.querySelector('input[name="email_address"]'), nm = f.querySelector('input[name="fields[first_name]"]');
+    var msg = f.querySelector('.nudge-msg'), btn = f.querySelector('button[type="submit"]');
+    var email = (em.value || '').trim(), name = (nm.value || '').trim();
+    function say(t, ok) { msg.textContent = t; msg.classList.toggle('ok', !!ok); }
+    em.removeAttribute('aria-invalid');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { em.setAttribute('aria-invalid', 'true'); say('Pop in your email address so I know where to send it.'); em.focus(); return; }
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) { say('Looks like you’re offline. No rush, try again when you’re back online.'); return; }
+    var body = new URLSearchParams(); body.append('email_address', email); if (name) body.append('fields[first_name]', name);
+    btn.disabled = true; var label = btn.textContent; btn.textContent = 'Sending…'; say('');
+    fetch(NUDGE_URL, { method: 'POST', mode: 'no-cors', body: body })
+      .then(function () {
+        try { localStorage.setItem(NUDGE_KEY, '1'); } catch (er) { /* storage unavailable */ }
+        var card = f.closest('.nudge');
+        f.querySelectorAll('.field, button, .nudge-fine').forEach(function (n) { n.hidden = true; });
+        say('Yay! Check your inbox for your first nudge 🌸', true);
+        if (card) { var ln = card.querySelector('.nudge-line'); if (ln) ln.hidden = true; }
+      })
+      .catch(function () {
+        btn.disabled = false; btn.textContent = label;
+        say('Hmm, that didn’t go through. Check your connection and try again. Your info is still here.');
+      });
+  });
+
   function tab(t) { go({ tab: t, cat: null, grp: 'All', wid: null, ch: null }); }
 
   function render() {
@@ -1328,7 +1396,7 @@ const PLUS_CHECKOUT_URL = 'https://neurorevolution.thrivecart.com/little-flower-
       var n = D.WORKOUTS.filter(function (w) { return w.cat === c.id; }).length;
       return '<button class="tile" data-a="cat" data-id="' + c.id + '">' + ic(c.icon) + (n ? '<i>' + n + '</i>' : '') + '<b>' + esc(c.name) + '</b><span>' + esc(c.sub) + '</span></button>';
     }).join('');
-    return '<div class="stack"><h1>Move your body.<br>Your way.</h1>' + quoteCard() + activeStrip() + '<div class="kicker">Pick a workout style</div><div class="grid">' + tiles + '</div></div>';
+    return '<div class="stack"><h1>Move your body.<br>Your way.</h1>' + quoteCard() + activeStrip() + '<div class="kicker">Pick a workout style</div><div class="grid">' + tiles + '</div>' + nudgeCard('home') + '</div>';
   }
 
   function viewCat(id) {
@@ -1463,6 +1531,7 @@ const PLUS_CHECKOUT_URL = 'https://neurorevolution.thrivecart.com/little-flower-
       (hist ? '<div class="kicker">Recent activity</div>' + hist : '<div class="card muted">Finish a workout and it shows up here.</div>') +
       '<div class="card stack"><div class="kicker">Cues</div>' + sw('voice', 'Voice coach', 'Speaks changes and the 5 second countdown') + sw('beeps', 'Beeps', 'Tones at 5, 4, 3, 2, 1 and at every change') + sw('flash', 'Screen flash', 'The screen flashes at each change') +
       '<button class="btn block" data-a="testsound">Test sound and voice</button><p class="note">On iPhone, keep the screen on while you train and turn the silent switch off. The app asks your phone to stay awake during a workout.</p></div>' +
+      nudgeCard('me') +
       '<button class="btn ghost block" data-a="reset" data-confirm="Tap again to erase everything">Erase my data</button></div>';
   }
 
