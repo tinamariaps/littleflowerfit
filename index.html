@@ -318,6 +318,27 @@ nav#nav button.on svg { transform: translateY(-1px) scale(1.06); }
 .nudge-on { display: flex; align-items: center; gap: 10px; padding: 12px 16px; font-size: 14px; font-weight: 700; color: var(--muted); }
 .nudge-on::before { content: ''; width: 22px; height: 22px; flex: none; background: var(--nudge-grad); -webkit-mask: var(--lf-flower) center / contain no-repeat; mask: var(--lf-flower) center / contain no-repeat; }
 @media (prefers-reduced-motion: reduce) { .nudge::after { animation: none; } }
+
+/* Fit Habits (lf.habits) */
+.habit { position: relative; overflow: hidden; gap: 12px; padding-top: 20px; }
+.habit::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 5px; background: var(--grad); }
+.hweek li { position: relative; }
+.habit .htheme { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.habit .hprompt { font-size: 20px; font-weight: 800; line-height: 1.3; color: var(--fg); }
+.habit .hwhy { font-size: 14px; color: var(--muted); line-height: 1.4; }
+.habit .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.habit .hdone { display: flex; align-items: center; gap: 12px; font-size: 17px; font-weight: 800; }
+.hbloom { width: 44px; height: 44px; flex: none; background: var(--grad); -webkit-mask: var(--lf-flower) center / contain no-repeat; mask: var(--lf-flower) center / contain no-repeat; animation: hbloom .8s var(--ease) both; }
+@keyframes hbloom { 0% { transform: scale(.2) rotate(-60deg); opacity: 0; } 70% { transform: scale(1.15) rotate(8deg); opacity: 1; } 100% { transform: scale(1) rotate(0); } }
+.hweek { display: flex; justify-content: space-between; gap: 4px; padding: 4px 0 0; list-style: none; margin: 0; }
+.hweek li { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: var(--muted); flex: 1; }
+.hweek .f { width: 30px; height: 30px; -webkit-mask: var(--lf-flower) center / contain no-repeat; mask: var(--lf-flower) center / contain no-repeat; background: color-mix(in srgb, var(--accent) 16%, transparent); transform: scale(.62); transition: transform .4s var(--ease); }
+.hweek li.on .f { background: var(--grad); transform: scale(1); }
+.hweek li.today { color: var(--fg); }
+.hstats { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 14px; }
+.hstats b { font-size: 15px; }
+.hcheer { font-size: 14px; color: var(--fg); opacity: .85; }
+@media (prefers-reduced-motion: reduce) { .hbloom { animation: none; } .hweek .f { transition: none; } }
 </style><style>[hidden]{display:none!important} html{padding-top:env(safe-area-inset-top,0px)}</style><script>/* Little Flower Plus: apply a Plus color theme before first paint */try{var lfp=JSON.parse(localStorage.getItem('lf.plus')||'null'),lfs=localStorage.getItem('lf.skin');if(lfp&&lfp.on===true&&lfs)document.documentElement.setAttribute('data-skin',lfs)}catch(e){}</script>
 <style>
 :root { --lf-flower: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='%23fff'%3E%3Cpath d='M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z' transform='rotate(0 60 60)'/%3E%3Cpath d='M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z' transform='rotate(72 60 60)'/%3E%3Cpath d='M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z' transform='rotate(144 60 60)'/%3E%3Cpath d='M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z' transform='rotate(216 60 60)'/%3E%3Cpath d='M60 60 C37 53 34 20 62 5 C86 20 82 50 60 60Z' transform='rotate(288 60 60)'/%3E%3C/g%3E%3C/svg%3E"); }
@@ -1388,6 +1409,84 @@ const PLUS_CHECKOUT_URL = 'https://neurorevolution.thrivecart.com/little-flower-
     return out ? '<div class="stack"><div class="kicker">Your challenges today</div>' + out + '</div>' : '';
   }
 
+  /* ---------- Fit Habits: one small follow-through habit a day (lf.habits) ---------- */
+  var HABIT_KEY = 'lf.habits';
+  var HABITS = [
+    ['Show up', 'Put on your sneakers and move for 5 minutes, even if you only walk around the kitchen.'],
+    ['Show up', 'Set a 5-minute timer and stretch while the coffee brews.'],
+    ['Show up', 'Do one song’s worth of movement. Dance, march, or sway. All of it counts.'],
+    ['Show up', 'Step outside and walk to the end of the street and back.'],
+    ['Show up', 'Lay out tomorrow’s workout clothes tonight so future you has a head start.'],
+    ['Show up', 'Open the app and start the shortest workout. You can stop after 5 minutes.'],
+    ['Show up', 'Do 10 slow sit-to-stands from a chair before lunch.'],
+    ['Show up', 'Take a 5-minute walk right after one meal today.'],
+    ['Do the hard thing', 'Pick one task you’ve been putting off and give it just 10 minutes.'],
+    ['Do the hard thing', 'Drink a full glass of water before your first cup of coffee.'],
+    ['Do the hard thing', 'Make that one phone call or appointment you keep moving to tomorrow.'],
+    ['Do the hard thing', 'Hold a wall sit or plank for 20 seconds. Wobbly is fine.'],
+    ['Do the hard thing', 'Put your phone in another room for the first 30 minutes after waking.'],
+    ['Do the hard thing', 'Go to bed 20 minutes earlier tonight, even though the couch is calling.'],
+    ['Do the hard thing', 'Clear one small surface you’ve been avoiding, like a counter, a chair, or the car seat.'],
+    ['Say a kind no', 'Say no to one thing today with one short sentence and no apology speech.'],
+    ['Say a kind no', 'Block 15 minutes on your calendar for yourself and treat it like a real appointment.'],
+    ['Say a kind no', 'Practice it out loud: “That won’t work for me, thanks for thinking of me.”'],
+    ['Say a kind no', 'Let one non-urgent text wait until after you’ve moved your body.'],
+    ['Say a kind no', 'Hand off one chore to someone else in the house, and let it be done their way.'],
+    ['Say a kind no', 'Skip one extra you usually say yes to out of guilt, and rest instead.'],
+    ['Say a kind no', 'When someone asks for your time today, pause and say “Let me check” before answering.'],
+    ['Keep a promise', 'Choose one tiny promise to yourself this morning and keep it by tonight.'],
+    ['Keep a promise', 'Eat one meal sitting down, slowly, with no multitasking.'],
+    ['Keep a promise', 'Write down one thing you’ll do for your body tomorrow, then put it where you’ll see it.'],
+    ['Keep a promise', 'Take the 5-minute break you told yourself you deserved. Actually take it.'],
+    ['Keep a promise', 'Add one serving of vegetables or fruit to a meal, like you said you would.'],
+    ['Keep a promise', 'Do your bedtime stretch, even if it’s only three deep breaths on the bed.'],
+    ['Keep a promise', 'Go back to one small goal you set and quit. Do the very first step today.'],
+    ['Keep a promise', 'Tell one person about one healthy thing you’re doing, so it feels real.']
+  ];
+  var HABIT_ICON = { 'Show up': '👟', 'Do the hard thing': '💪', 'Say a kind no': '🫶', 'Keep a promise': '🤝' };
+  function hDay(d) { d = d || new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  function hLoad() { try { var o = JSON.parse(localStorage.getItem(HABIT_KEY) || '{}'); o.done = o.done || {}; o.skip = o.skip || {}; return o; } catch (e) { return { done: {}, skip: {} }; } }
+  function hSave(o) { try { localStorage.setItem(HABIT_KEY, JSON.stringify(o)); } catch (e) {} }
+  function hToday() { var d = new Date(), n = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5); return HABITS[((n * 7) % HABITS.length + HABITS.length) % HABITS.length]; }
+  function hWeek(o) {
+    var t = new Date(), start = new Date(t.getFullYear(), t.getMonth(), t.getDate() - ((t.getDay() + 6) % 7)), names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], out = [], c = 0;
+    for (var i = 0; i < 7; i++) { var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i), k = hDay(d), on = !!o.done[k]; if (on) c++; out.push({ n: names[i], on: on, today: k === hDay(t) }); }
+    return { days: out, count: c };
+  }
+  function hCheer(w, total) {
+    if (w === 0 && total === 0) return 'Your first flower is one small step away. No rush.';
+    if (w === 0) return 'A fresh week, a fresh start. Everything you’ve kept still counts.';
+    if (w === 1) return 'One kept promise this week. That’s how it starts.';
+    if (w <= 3) return 'Look at you following through. Small things add up.';
+    if (w <= 5) return 'Your garden is filling in. You’re becoming someone who shows up.';
+    return 'What a week. You kept showing up for yourself. 🌸';
+  }
+  function habitCard() {
+    var o = hLoad(), k = hDay(), h = hToday(), done = !!o.done[k], skip = !!o.skip[k], wk = hWeek(o), total = Object.keys(o.done).length, body;
+    if (done) body = '<div class="hdone"><span class="hbloom" aria-hidden="true"></span><span>Done. You kept a promise to yourself today.</span></div><button class="btn ghost small" data-h="undo" style="align-self:flex-start">Undo</button>';
+    else if (skip) body = '<p class="hwhy">Rest is part of it too. This one will still be here if you change your mind.</p><button class="btn small" data-h="unskip" style="align-self:flex-start">Actually, I’ll try it</button>';
+    else body = '<button class="btn primary block" data-h="done">I did it 🌸</button><button class="btn ghost block" data-h="skip">Not today, that’s okay</button>';
+    var row = wk.days.map(function (d) { return '<li class="' + (d.on ? 'on' : '') + (d.today ? ' today' : '') + '"><span class="f" aria-hidden="true"></span>' + d.n + '<span class="sr-only visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">' + (d.on ? ', habit done' : ', open') + '</span></li>'; }).join('');
+    return '<section class="card stack habit" id="habitCard" aria-labelledby="habitH"><div class="kicker" id="habitH">Today’s habit</div>' +
+      '<div class="htheme">' + HABIT_ICON[h[0]] + ' ' + esc(h[0]) + '</div><p class="hprompt">' + esc(h[1]) + '</p>' + body +
+      '<div class="stack" style="gap:8px;margin-top:4px" aria-label="Follow-through this week"><div class="hstats"><b>Follow-through</b><span class="muted">' + wk.count + ' this week · ' + total + ' kept in all</span></div>' +
+      '<ul class="hweek">' + row + '</ul><p class="hcheer">' + esc(hCheer(wk.count, total)) + '</p></div>' +
+      '<p class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)" role="status" aria-live="polite" id="habitLive"></p></section>';
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-h]'); if (!b) return;
+    var o = hLoad(), k = hDay(), a = b.getAttribute('data-h'), msg = '';
+    if (a === 'done') { o.done[k] = 1; delete o.skip[k]; msg = 'Habit done. A flower bloomed for today.'; }
+    else if (a === 'undo') { delete o.done[k]; msg = 'Okay, unmarked.'; }
+    else if (a === 'skip') { o.skip[k] = 1; msg = 'No problem. Not today is okay.'; }
+    else if (a === 'unskip') { delete o.skip[k]; msg = 'Here it is again.'; }
+    hSave(o);
+    var c = document.getElementById('habitCard'); if (!c) return;
+    var t = document.createElement('div'); t.innerHTML = habitCard(); var n = t.firstChild; c.replaceWith(n);
+    var live = document.getElementById('habitLive'); setTimeout(function () { if (live) live.textContent = msg; }, 50);
+    var f = n.querySelector('[data-h]'); if (f) f.focus({ preventScroll: true });
+  });
+
   function viewTrain() {
     if (V.wid) return viewWorkout(wo(V.wid));
     if (V.cat === 'custom') return viewCustom();
@@ -1396,7 +1495,7 @@ const PLUS_CHECKOUT_URL = 'https://neurorevolution.thrivecart.com/little-flower-
       var n = D.WORKOUTS.filter(function (w) { return w.cat === c.id; }).length;
       return '<button class="tile" data-a="cat" data-id="' + c.id + '">' + ic(c.icon) + (n ? '<i>' + n + '</i>' : '') + '<b>' + esc(c.name) + '</b><span>' + esc(c.sub) + '</span></button>';
     }).join('');
-    return '<div class="stack"><h1>Move your body.<br>Your way.</h1>' + quoteCard() + activeStrip() + '<div class="kicker">Pick a workout style</div><div class="grid">' + tiles + '</div>' + nudgeCard('home') + '</div>';
+    return '<div class="stack"><h1>Move your body.<br>Your way.</h1>' + habitCard() + quoteCard() + activeStrip() + '<div class="kicker">Pick a workout style</div><div class="grid">' + tiles + '</div>' + nudgeCard('home') + '</div>';
   }
 
   function viewCat(id) {
