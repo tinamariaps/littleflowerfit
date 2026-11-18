@@ -1239,19 +1239,109 @@ const PLUS_CHECKOUT_URL = 'https://neurorevolution.thrivecart.com/little-flower-
   function goBeep() { beep(1046, 0.14, 0.45, 0); beep(1318, 0.4, 0.45, 0.17); }
   function restBeep() { beep(659, 0.18, 0.4, 0); beep(494, 0.3, 0.4, 0.2); }
   function chime() { beep(784, 0.2, 0.4, 0); beep(988, 0.2, 0.4, 0.2); beep(1175, 0.2, 0.4, 0.4); beep(1568, 0.6, 0.4, 0.6); }
+  /* ---------- voice clips: recorded coach voice with phone-voice fallback ---------- */
+  var VX = { clips: null, buf: {}, pend: {}, q: [], busy: false, tok: 0, srcs: [], n: 0 };
+  function vNorm(s) {
+    return String(s).toLowerCase().replace(/[\u2018\u2019]/g, "'").replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  function vChunks(text) {
+    var out = [], t = String(text).replace(/\s+/g, ' ').trim(), re = /[.!?:]+(?:\s+|$)/g, last = 0, m, piece;
+    while ((m = re.exec(t))) {
+      piece = t.slice(last, m.index);
+      last = m.index + m[0].length;
+      if (/\d/.test(t.charAt(m.index - 1)) && /\d/.test(t.charAt(last))) continue;
+      if (vNorm(piece)) out.push(vNorm(piece));
+    }
+    if (vNorm(t.slice(last))) out.push(vNorm(t.slice(last)));
+    return out;
+  }
+  function vInit() {
+    try {
+      fetch('audio/manifest.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { if (j && j.clips) VX.clips = j.clips; }).catch(function () { /* no clips: phone voice */ });
+    } catch (e) { /* ignore */ }
+  }
+  function vLoad(k) {
+    if (VX.buf[k]) return Promise.resolve(VX.buf[k]);
+    if (VX.pend[k]) return VX.pend[k];
+    var a = audio();
+    if (!a || !VX.clips || !VX.clips[k]) return Promise.resolve(null);
+    VX.pend[k] = fetch('audio/' + VX.clips[k]).then(function (r) { if (!r.ok) throw new Error('clip'); return r.arrayBuffer(); }).then(function (ab) {
+      return new Promise(function (res, rej) { var p = a.decodeAudioData(ab, res, rej); if (p && p.catch) p.catch(rej); });
+    }).then(function (b) {
+      if (VX.n > 300) { VX.buf = {}; VX.n = 0; }
+      VX.buf[k] = b; VX.n++; delete VX.pend[k]; return b;
+    }).catch(function () { delete VX.pend[k]; return null; });
+    return VX.pend[k];
+  }
+  function vWarm(texts) {
+    if (!VX.clips) return;
+    var seen = {};
+    texts.forEach(function (t) { vChunks(t).forEach(function (k) { if (VX.clips[k] && !seen[k]) { seen[k] = 1; vLoad(k); } }); });
+  }
+  function vWarmSteps(steps) {
+    var t = ['Get ready.', 'First up:', 'Next up:', 'Switch.', 'Rest.', 'Break.', 'Warm up.', 'Cool down.', '1', '2', '3', '4', '5', '10 seconds', '30 seconds'];
+    (D.HALF || []).forEach(function (h) { t.push(h); });
+    steps.forEach(function (s, i) { t.push(sayOf(s)); t.push(nxSay(s)); if (i === 0) t.unshift(nxSay(steps[1])); });
+    vWarm(t);
+  }
+  function vPlay(b, done) {
+    var a = audio(), s;
+    if (!a) { done(); return; }
+    try {
+      s = a.createBufferSource(); s.buffer = b; s.connect(a.destination);
+      s.onended = function () { var i = VX.srcs.indexOf(s); if (i >= 0) VX.srcs.splice(i, 1); done(); };
+      VX.srcs.push(s); s.start(0);
+    } catch (e) { done(); }
+  }
+  function vPump() {
+    if (VX.busy || !VX.q.length) return;
+    VX.busy = true;
+    var tok = VX.tok, k = VX.q.shift();
+    vLoad(k).then(function (b) {
+      if (tok !== VX.tok) return;
+      if (!b) { VX.busy = false; vPump(); return; }
+      vPlay(b, function () {
+        if (tok !== VX.tok) return;
+        setTimeout(function () { if (tok !== VX.tok) return; VX.busy = false; vPump(); }, VX.q.length ? 110 : 0);
+      });
+    });
+  }
+  function vNow(k) { vLoad(k).then(function (b) { if (b) vPlay(b, function () { /* done */ }); }); }
+  function stopVoice() {
+    VX.tok++; VX.q = []; VX.busy = false;
+    VX.srcs.forEach(function (s) { try { s.onended = null; s.stop(); } catch (e) { /* ignore */ } });
+    VX.srcs = [];
+    try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) { /* ignore */ }
+  }
   function say(text, o) {
     o = o || {};
-    if (!S.s.voice || !text || !('speechSynthesis' in window)) return;
+    if (!S.s.voice || !text) return;
+    var ks = VX.clips ? vChunks(text) : [];
+    if (ks.length && ks.every(function (k) { return VX.clips[k]; }) && audio()) {
+      if (o.interrupt) stopVoice();
+      if (ks.length === 1 && /^[1-5]$/.test(ks[0])) vNow(ks[0]);
+      else { ks.forEach(function (k) { VX.q.push(k); }); vPump(); }
+      return;
+    }
+    if (!('speechSynthesis' in window)) return;
     try {
-      if (o.interrupt) speechSynthesis.cancel();
+      if (o.interrupt) stopVoice();
       var u = new SpeechSynthesisUtterance(text);
       u.rate = o.rate || 1.05; u.lang = 'en-US';
       speechSynthesis.speak(u);
     } catch (e) { /* ignore */ }
   }
   function primeVoice() {
+    try {
+      var a = audio();
+      if (a) { var s = a.createBufferSource(); s.buffer = a.createBuffer(1, 1, 22050); s.connect(a.destination); s.start(0); }
+    } catch (e) { /* ignore */ }
     try { if ('speechSynthesis' in window) { var u = new SpeechSynthesisUtterance('ready'); u.volume = 0; speechSynthesis.speak(u); } } catch (e) { /* ignore */ }
   }
+  (function () {
+    var once = function () { document.removeEventListener('touchend', once, true); document.removeEventListener('click', once, true); try { var a = audio(); if (a) { var s = a.createBufferSource(); s.buffer = a.createBuffer(1, 1, 22050); s.connect(a.destination); s.start(0); } } catch (e) { /* ignore */ } };
+    document.addEventListener('touchend', once, true); document.addEventListener('click', once, true);
+  })();
   function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* ignore */ } }
   function flash(id) {
     if (!S.s.flash) return;
@@ -1670,6 +1760,7 @@ const PLUS_CHECKOUT_URL = 'https://neurorevolution.thrivecart.com/little-flower-
     P.w = w; P.on = true; P.finished = false; P.paused = false; P.half = false;
     P.steps = [{ t: 'ready', n: 'Get ready', d: 10 }].concat(w.steps);
     P.total = w.steps.reduce(function (a, s) { return a + s.d; }, 0);
+    vWarmSteps(P.steps);
     var ov = $('#player'); ov.innerHTML = playerHTML(); ov.hidden = false;
     document.body.style.overflow = 'hidden';
     lock(); syncToggles();
@@ -1741,7 +1832,7 @@ const PLUS_CHECKOUT_URL = 'https://neurorevolution.thrivecart.com/little-flower-
   }
   function togglePause() {
     var b = $('#pPlay'); if (!b) return;
-    if (!P.paused) { P.remain = Math.max(0, P.endAt - Date.now()); P.paused = true; try { speechSynthesis.cancel(); } catch (e) { /* ignore */ } b.innerHTML = ic('play'); $('#pPhase').textContent = 'Paused'; }
+    if (!P.paused) { P.remain = Math.max(0, P.endAt - Date.now()); P.paused = true; stopVoice(); b.innerHTML = ic('play'); $('#pPhase').textContent = 'Paused'; }
     else { P.endAt = Date.now() + P.remain; P.paused = false; b.innerHTML = ic('pause'); $('#pPhase').textContent = PLABEL[P.steps[P.i].t]; audio(); }
   }
 
@@ -1765,7 +1856,7 @@ const PLUS_CHECKOUT_URL = 'https://neurorevolution.thrivecart.com/little-flower-
 
   function closePlayer() {
     clearInterval(P.timer); P.on = false;
-    try { speechSynthesis.cancel(); } catch (e) { /* ignore */ }
+    stopVoice();
     $('#player').hidden = true; $('#player').innerHTML = '';
     if (!R.on) { unlock(); document.body.style.overflow = ''; }
     render();
@@ -1809,6 +1900,7 @@ const PLUS_CHECKOUT_URL = 'https://neurorevolution.thrivecart.com/little-flower-
   function startRun() {
     if (R.on) return;
     audio(); primeVoice();
+    vWarm(['Run started.', 'Goal:', 'a 5K', '1 mile', '2 miles', '5 miles', 'Go at your own pace.', 'Goal reached.', 'Amazing work.', 'Keep going or finish when you are ready.']);
     R.on = true; R.mode = R0.mode; R.goal = R0.goal; R.paused = false; R.accum = 0; R.seg = Date.now(); R.lastT = Date.now();
     R.dist = 0; R.nextMile = 1; R.goalHit = false; R.last = null; R.fix = R.mode === 'tread' ? 'tread' : 'wait';
     var sp = parseFloat(($('#rSpdIn') || {}).value), ic2 = parseFloat(($('#rIncIn') || {}).value);
@@ -1892,7 +1984,7 @@ const PLUS_CHECKOUT_URL = 'https://neurorevolution.thrivecart.com/little-flower-
   }
   function closeRun() {
     clearInterval(R.timer); stopGPS(); R.on = false;
-    try { speechSynthesis.cancel(); } catch (e) { /* ignore */ }
+    stopVoice();
     $('#runner').hidden = true; $('#runner').innerHTML = '';
     if (!P.on) { unlock(); document.body.style.overflow = ''; }
     render();
@@ -1934,9 +2026,9 @@ const PLUS_CHECKOUT_URL = 'https://neurorevolution.thrivecart.com/little-flower-
       case 'newq': Q.i = (Q.i + 1 + Math.floor(Math.random() * (D.QUOTES.length - 1))) % D.QUOTES.length; render(); break;
       case 'copy': copyText(ds.t); break;
       case 'set': S.s[ds.k] = !S.s[ds.k]; save(); render(); break;
-      case 'testsound': audio(); primeVoice(); goBeep(); say('Sound check. Five, four, three, two, one. Go!', { interrupt: true }); break;
+      case 'testsound': audio(); primeVoice(); vWarm(['Sound check. Five, four, three, two, one. Go!']); goBeep(); say('Sound check. Five, four, three, two, one. Go!', { interrupt: true }); break;
       case 'reset': S = defState(); try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } save(); render(); toast('Data erased'); break;
-      case 'tvoice': S.s.voice = !S.s.voice; save(); syncToggles(); if (R.on) $('#rVoice').classList.toggle('off', !S.s.voice); break;
+      case 'tvoice': S.s.voice = !S.s.voice; if (!S.s.voice) stopVoice(); save(); syncToggles(); if (R.on) $('#rVoice').classList.toggle('off', !S.s.voice); break;
       case 'tbeep': S.s.beeps = !S.s.beeps; save(); syncToggles(); break;
       case 'pEnd': askEnd(); break;
       case 'pKeep': $('#pSheet').hidden = true; if (P.paused) togglePause(); break;
@@ -1997,6 +2089,7 @@ const PLUS_CHECKOUT_URL = 'https://neurorevolution.thrivecart.com/little-flower-
     act(el.dataset.a, el.dataset, el);
   });
 
+  vInit();
   render();
   initCloud();
 })();
